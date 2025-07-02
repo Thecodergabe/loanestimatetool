@@ -1,17 +1,35 @@
+
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  nitro: {
-    preset: 'cloudflare-pages',
-    serveStatic: true
+    build: {
+    transpile: ['vuetify'],
   },
-  ssr: true,
-  modules: [
+    modules: [
+    (_options, nuxt) => {
+      nuxt.hooks.hook('vite:extendConfig', (config) => {
+        // @ts-expect-error
+        config.plugins.push(vuetify({ autoImport: true }))
+      })
+    },
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
     '@nuxt/test-utils'
-  ]
+  ],
+  vite: {
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    },
+  },
+  nitro: {
+    preset: 'cloudflare-pages',
+    serveStatic: true
+  },
+  ssr: true,
 })
