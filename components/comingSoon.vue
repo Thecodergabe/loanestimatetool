@@ -6,5 +6,5 @@
 </template>
 <script lang="ts" setup>
 import { useDisplay } from 'vuetify/lib/composables/display.mjs';
-const { mobile } = toRefs(useDisplay());
+const { mobile } = useDisplay();
 </script>
