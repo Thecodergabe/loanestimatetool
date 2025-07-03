@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "test": "npx vitest run",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -22,7 +23,9 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@vitest/ui": "^3.2.4",
     "vite-plugin-vuetify": "^2.1.1",
+    "vitest": "^3.2.4",
     "vuetify": "^3.8.11"
   }
 }
