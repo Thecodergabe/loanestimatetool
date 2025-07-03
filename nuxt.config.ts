@@ -20,6 +20,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils'
   ],
+  css: ['vuetify/styles','@mdi/font/css/materialdesignicons.min.css'],
+  plugins: ['~/plugins/vuetify.ts'],
   vite: {
     vue: {
       template: {
