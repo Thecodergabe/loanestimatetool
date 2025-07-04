@@ -1,11 +1,11 @@
 <template>
-  <ComingSoon />
-  <!-- <LoanForm class="w-50" /> -->
+  <!-- <ComingSoon /> -->
+  <LoanEstimatorContainer  />
 </template>
 
 <script lang="ts" setup>
 import ComingSoon from '~/components/comingSoon.vue';
-// import LoanForm from '~/components/loanForm.vue';
+import LoanEstimatorContainer from '~/components/loanEstimatorContainer.vue';
 
 
 </script>

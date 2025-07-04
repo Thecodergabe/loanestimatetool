@@ -1,80 +1,160 @@
 <template>
-  <v-form v-model="isValid"
-          @submit.prevent="submitForm">
-    <v-card class="d-flex flex-column gap-4">
+  <v-form v-model="isValid" @submit.prevent="submitForm">
+    <v-card class="d-flex flex-column gap-4"
+            :width="mobile ? '100vw' : '35vw'"
+            max-width="800px">
       <v-card-title class="pa-4">Mortgage Calculator</v-card-title>
-      <v-card-text>
 
-        <!-- 🔷 Core Fields -->
-        <div v-for="field in coreFields"
-             :key="field.key"
-             class="d-flex align-center gap-2">
-          <component
-                    v-model="form[field.key]" 
-                    :is="getFieldRenderConfig(field).component"
-                     v-bind="getFieldRenderConfig(field).props" />
-          <v-tooltip v-if="field.tooltip"
-                     location="top">
-            <template #activator="{ props }">
-              <v-icon v-bind="props"
-                      class="ms-1 mb-4"
-                      size="20"
-                      color="primary">
-                mdi-help-circle-outline
-              </v-icon>
-            </template>
-            <span>{{ field.tooltip }}</span>
-          </v-tooltip>
+      <v-card-text>
+        <!-- Purchase Price -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.purchasePrice"
+              label="Purchase Price"
+              prefix="$"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+        <PercentageSliderFeild v-model="props.modelValue.downPayment" :min="0" :max="100"/>
+        <div class="text-caption text-medium-emphasis mt-n4 mb-2 ms-1">
+          ≈ {{ formatCurrency(downPaymentAmount) }}
         </div>
 
-        <!-- Advanced Toggle -->
-        <v-divider class="my-4" />
-        <v-btn variant="text"
-               color="primary"
-               class="text-caption font-weight-medium"
-               @click="showAdvanced = !showAdvanced">
-          <v-icon class="me-2"
-                  size="18"
-                  :class="{ 'rotate-180': showAdvanced }"
-                  transition="rotate-transition">
-            mdi-chevron-down
-          </v-icon>
-          {{ showAdvanced ? 'Hide' : 'Show' }} Advanced Fields
-        </v-btn>
-
-        <!-- 🧩 Advanced Fields -->
-        <v-expand-transition>
-          <div v-if="showAdvanced"
-               class="d-flex flex-column gap-4 mt-4">
-            <div v-for="field in advancedFields"
-                 :key="field.key"
-                 class="d-flex align-center gap-2">
-              <component :is="getFieldRenderConfig(field).component"
-                          v-model="form[field.key]"
-                         v-bind="getFieldRenderConfig(field).props" />
-              <v-tooltip v-if="field.tooltip"
-                         location="top">
-                <template #activator="{ props }">
-                  <v-icon v-bind="props"
-                          class="ms-1 mb-4"
-                          size="20"
-                          color="primary">
-                    mdi-help-circle-outline
-                  </v-icon>
-                </template>
-                <span>{{ field.tooltip }}</span>
-              </v-tooltip>
-            </div>
+        <!-- Loan Term -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.term"
+              label="Loan Term (years)"
+              type="number"
+              density="default"
+            />
           </div>
-        </v-expand-transition>
+        </div>
 
+        <!-- Interest Rate -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.rate"
+              label="Interest Rate (%)"
+              suffix="%"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- ZIP Code -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.zip"
+              label="ZIP Code"
+              maxlength="5"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Loan Type -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-select
+              v-model="props.modelValue.loanType"
+              label="Loan Type"
+              :items="loanTypes"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Monthly HOA Dues -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.hoa"
+              label="Monthly HOA Dues"
+              prefix="$"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Points Paid -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.points"
+              label="Points Paid"
+              suffix="pts"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Include PMI -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-switch
+              v-model="props.modelValue.includePMI"
+              label="Include PMI"
+              color="primary"
+            />
+          </div>
+        </div>
+
+        <!-- Property Tax Rate -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.taxRate"
+              label="Property Tax Rate"
+              suffix="%"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Homeowners Insurance -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.insurance"
+              label="Homeowners Insurance"
+              prefix="$"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
+
+        <!-- Estimated Closing Costs -->
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model="props.modelValue.closingCosts"
+              label="Estimated Closing Costs (%)"
+              suffix="%"
+              type="number"
+              density="default"
+            />
+          </div>
+        </div>
       </v-card-text>
+
       <v-card-actions>
         <v-btn type="submit"
                variant="elevated"
                color="primary"
                block>
-          Calculate Estimate
+          See Estimate
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -82,34 +162,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { type LoanModel, LoanType } from '~/models/loanModel'
-import { useLoanFormSchemas } from '~/composables/useLoanFormSchemas'
-import { getFieldRenderConfig } from '~/utilities/renderField'
-const { coreFields, advancedFields } = useLoanFormSchemas()
+import { ref, computed } from 'vue'
+import { useDisplay } from 'vuetify'
+import { LoanType, type LoanModel } from '~/models/loanModel'
+
+const { mobile } = useDisplay()
+const props = defineProps<{ modelValue: LoanModel }>()
+const emit = defineEmits(['update:modelValue', 'seeResults'])
 
 const isValid = ref(false)
 
-const form = ref<LoanModel>({
-  purchasePrice: 350000,
-  downPayment: 20,           // percent
-  term: 30,                  // years
-  rate: 6.5,                 // APR %
-  zip: '97229',
-  loanType: LoanType.Conventional,
+const loanTypes = Object.values(LoanType)
 
-  // Optional (but prepopulated for valid submission)
-  hoa: 0,
-  points: 0,
-  includePMI: false,
-  taxRate: 1.2,              // Percent (e.g. 1.2%)
-  insurance: 1200,           // Annual $
-  closingCosts: 3            // Percent of purchasePrice
+const downPaymentAmount = computed(() => {
+  return (props.modelValue.purchasePrice * props.modelValue.downPayment) / 100
 })
-const showAdvanced = ref(false)
+
+const formatCurrency = (value: number): string =>
+  value.toLocaleString(undefined, {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 
 const submitForm = () => {
-  console.log('Submitted:', form.value)
-  // Placeholder: emit to parent or navigate to results
+  emit('seeResults')
 }
 </script>
