@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import { createReadStream } from 'fs'
+import * as readline from 'readline'
 import { load } from "cheerio"
 import * as Papa from 'papaparse'
 
@@ -31,32 +32,62 @@ async function downloadZipToCountyCSV(): Promise<void> {
   await fs.writeFile(ZIP_CSV_PATH, Buffer.from(buffer))
 }
 
-
 async function parseZipToCounty(): Promise<ZipCountyRow[]> {
-  const file = await fs.readFile(ZIP_CSV_PATH, 'utf-8')
-  const result = Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: h => h.trim().toLowerCase(),
-  })
+  const stream = createReadStream(ZIP_CSV_PATH, 'utf-8')
+  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity })
 
-  if (result.errors.length) {
-    console.error('❌ CSV parse errors:', result.errors)
-    throw new Error('Failed to parse ZIP-to-county CSV')
+  const rows: ZipCountyRow[] = []
+  let headers: string[] = []
+
+  for await (const line of rl) {
+    const values = line.split(',').map(v => v.trim())
+
+    if (!headers.length) {
+      headers = values.map(h => h.toLowerCase())
+      continue
+    }
+
+    const row: Record<string, string> = {}
+    headers.forEach((key, i) => {
+      row[key] = values[i]
+    })
+
+    const ZIP = row['zipcode']
+    const County = row['county']
+    const State = row['state_abbr']
+
+    if (ZIP && County && State) {
+      rows.push({ ZIP, County, State })
+    }
   }
 
-  return result.data
-    .map((row: any) => {
-      const ZIP = row['zipcode']?.trim()
-      const County = row['county']?.trim()
-      const State = row['state_abbr']?.trim()
-      if (ZIP && County && State) {
-        return { ZIP, County, State }
-      }
-      return null
-    })
-    .filter(Boolean) as ZipCountyRow[]
+  return rows
 }
+// async function parseZipToCounty(): Promise<ZipCountyRow[]> {
+//   const file = await fs.readFile(ZIP_CSV_PATH, 'utf-8')
+//   const result = Papa.parse(file, {
+//     header: true,
+//     skipEmptyLines: true,
+//     transformHeader: h => h.trim().toLowerCase(),
+//   })
+
+//   if (result.errors.length) {
+//     console.error('❌ CSV parse errors:', result.errors)
+//     throw new Error('Failed to parse ZIP-to-county CSV')
+//   }
+
+//   return result.data
+//     .map((row: any) => {
+//       const ZIP = row['zipcode']?.trim()
+//       const County = row['county']?.trim()
+//       const State = row['state_abbr']?.trim()
+//       if (ZIP && County && State) {
+//         return { ZIP, County, State }
+//       }
+//       return null
+//     })
+//     .filter(Boolean) as ZipCountyRow[]
+// }
 
 async function scrapeCountyTaxRates(): Promise<Record<string, number>> {
   const res = await fetch(TAX_FOUNDATION_URL, { redirect: 'follow' })

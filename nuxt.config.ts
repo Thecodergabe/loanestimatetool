@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'cloudflare-pages',
-    serveStatic: true
+    serveStatic: true,
   },
   ssr: true,
 })
