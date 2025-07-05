@@ -52,14 +52,22 @@
         </div>
       </div>
     </v-card-text>
-    <v-card-action class="align-center justify-center d-flex">
-      <v-btn class="mt-4"
+    <v-card-actions class="align-center justify-center d-flex mt-4">
+      <v-select v-model="exportFormat"
+                :items="['CSV', 'PDF']"
+                label="Export Format"
+                density="compact"
+                variant="solo"
+                hide-details
+                style="max-width: 150px"
+                class="me-4" />
+      <v-btn class="me-4"
              variant="outlined"
              color="primary"
-             @click="downloadCSV">
+             @click="downloadSchedule">
         Download Amortization Schedule
       </v-btn>
-    </v-card-action>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -80,7 +88,7 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import type { LoanModel } from '~/models/loanModel'
 import { useMortgageCalculator } from '~/composables/useMortgageCalculator'
-
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 // Register only core chart components globally
 ChartJS.register(
   ArcElement,
@@ -231,4 +239,86 @@ function downloadCSV() {
 
   URL.revokeObjectURL(url)
 }
+
+const exportFormat = ref<'CSV' | 'PDF'>('CSV')
+
+function downloadSchedule() {
+  if (exportFormat.value === 'CSV') {
+    downloadCSV()
+  } else if (exportFormat.value === 'PDF') {
+    downloadPDF()
+  }
+}
+
+async function downloadPDF() {
+  const pdfDoc = await PDFDocument.create()
+  let page = pdfDoc.addPage([595.28, 841.89]) // A4 size
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  const margin = 50
+  let y = 800
+  const lineHeight = 18
+
+  // Title
+  page.drawText('Amortization Schedule (Yearly Summary)', {
+    x: margin,
+    y,
+    size: 16,
+    font,
+    color: rgb(0, 0, 0)
+  })
+
+  y -= lineHeight * 2
+
+  // Header row
+  page.drawText('Year', { x: margin, y, size: 12, font, color: rgb(0.2, 0.2, 0.2) })
+  page.drawText('Principal Paid', { x: margin + 80, y, size: 12, font })
+  page.drawText('Interest Paid', { x: margin + 200, y, size: 12, font })
+  page.drawText('Remaining Balance', { x: margin + 320, y, size: 12, font })
+
+  y -= lineHeight
+
+  // Group by year
+  const grouped = new Map<number, { principal: number; interest: number; balance: number }>()
+
+  amortizationSchedule.value.forEach(p => {
+    const year = Math.ceil(p.month / 12)
+    if (!grouped.has(year)) {
+      grouped.set(year, { principal: 0, interest: 0, balance: p.balance })
+    }
+    const entry = grouped.get(year)!
+    entry.principal += p.principalPaid
+    entry.interest += p.interest
+    entry.balance = p.balance
+  })
+
+  for (const [year, data] of grouped.entries()) {
+    if (y < 60) {
+      // Add new page if needed
+      const newPage = pdfDoc.addPage([595.28, 841.89])
+      y = 800
+      page.drawText('Continued...', { x: margin, y, size: 12, font })
+      page = newPage
+    }
+
+    page.drawText(`${year}`, { x: margin, y, size: 10, font })
+    page.drawText(`$${data.principal.toFixed(2)}`, { x: margin + 80, y, size: 10, font })
+    page.drawText(`$${data.interest.toFixed(2)}`, { x: margin + 200, y, size: 10, font })
+    page.drawText(`$${data.balance.toFixed(2)}`, { x: margin + 320, y, size: 10, font })
+
+    y -= lineHeight
+  }
+
+  const pdfBytes = await pdfDoc.save()
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'amortization_schedule.pdf'
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+
 </script>

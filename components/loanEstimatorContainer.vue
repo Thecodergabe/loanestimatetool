@@ -1,22 +1,26 @@
 <template>
-  <div class="d-flex flex-column flex-lg-row align-start ga-4">
+  <v-container fluid
+               class="d-flex flex-column flex-lg-row align-start ga-4">
     <!-- Form Panel -->
-    <div class="flex-grow-1">
-        <LoanForm v-model="loanData" @see-results="scrollToId" />
+    <div class="flex-grow-1 w-100 w-lg-auto">
+      <LoanForm v-model="loanData"
+                :zip-data-found="zipDataFound"
+                @see-results="scrollToId" />
     </div>
 
     <!-- Chart Panel -->
-    <div
-      class="mt-4 mt-md-0 w-100 w-lg-auto"
-    >
-      <LoanResultsChart id="results" :form="loanData" />
+    <div class="mt-4 mt-md-0 w-100 w-lg-auto">
+      <LoanResultsChart id="results"
+                        :form="loanData" />
     </div>
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { LoanType, type LoanModel } from '~/models/loanModel'
+import { ref, watch } from 'vue'
+import { LoanType, type LoanModel } from '../models/loanModel'
+import { useZipEstimates } from '../composables/useZipEstimate'
+const zipDataFound = ref(false)
 
 // This is the shared reactive state between form and results
 const loanData = ref<LoanModel>({
@@ -24,7 +28,7 @@ const loanData = ref<LoanModel>({
   downPayment: 20,
   term: 30,
   rate: 6.5,
-  zip: '97229',
+  zip: '',
   loanType: LoanType.Conventional, // or LoanType.Conventional if using enum
   hoa: 100,
   points: 0,
@@ -32,6 +36,18 @@ const loanData = ref<LoanModel>({
   taxRate: 1.2,
   insurance: 1200,
   closingCosts: 3
+})
+
+
+watch(() => loanData.value.zip, async (zip) => {
+  if (!zip || zip.length !== 5) return
+
+  const { tax, insurance } = await useZipEstimates(zip)
+
+  zipDataFound.value = tax !== null || insurance !== null
+
+  if (tax !== null) loanData.value.taxRate = tax
+  if (insurance !== null) loanData.value.insurance = insurance
 })
 
 const scrollToId = () => {
@@ -42,5 +58,4 @@ const scrollToId = () => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
