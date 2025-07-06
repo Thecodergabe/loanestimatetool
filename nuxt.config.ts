@@ -1,39 +1,76 @@
-
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config'
+import compression from 'vite-plugin-compression2'
+
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
-  devtools: { enabled: true },
-    build: {
-    transpile: ['vuetify'],
-  },
-    modules: [
+  // Ensures compatibility with Cloudflare Pages runtime
+
+  modules: [
+    // Vuetify integration via Vite plugin
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
+        config.plugins ||= []
         config.plugins.push(vuetify({ autoImport: true }))
       })
     },
-    '@nuxt/eslint',
-    '@nuxt/fonts',
-    '@nuxt/icon',
-    '@nuxt/image',
-    '@nuxt/test-utils'
   ],
-  css: ['vuetify/styles','@mdi/font/css/materialdesignicons.min.css'],
-  plugins: ['~/plugins/vuetify.ts', 
-  { src: '~/plugins/initZipData.server.ts', mode: 'server' }
+  app: {
+    buildAssetsDir: '/_nuxt/', // optional: ensure asset path is correct
+  },
+
+  plugins: [
+    './plugins/vuetify.ts',
+    { src: './plugins/initZipData.server.ts', mode: 'server' },
   ],
+
+  ssr: true,
+  components: true,
+
+  devtools: {
+    enabled: true,
+  },
+
+  css: [
+    'vuetify/styles',
+    '@mdi/font/css/materialdesignicons.min.css',
+  ],
+
+  build: {
+    transpile: ['vuetify'],
+  },
+
+  routeRules: {
+    '/': { prerender: true },
+  },
+
+  experimental: {
+    appManifest: false,
+    payloadExtraction: true, // ✅ Reduces JS payload size for prerendered pages
+  },
+  compatibilityDate: '2025-05-15',
+  nitro: {
+    compressPublicAssets: true,
+    // preset: 'node',
+    preset: 'cloudflare-pages',
+    serveStatic: true,
+    static: true,
+  },
+
   vite: {
     vue: {
       template: {
         transformAssetUrls,
       },
     },
+    plugins: [
+      vuetify({ autoImport: true }),
+      compression({ algorithms: ['brotliCompress'] })
+    ],
+    define: {
+      'process.env.DEBUG': false,
+    },
+    build: {
+      minify: 'esbuild', // ✅ Use esbuild for faster, safer JS minification
+    },
   },
-  nitro: {
-    preset: 'cloudflare-pages',
-    serveStatic: true,
-  },
-  ssr: true,
 })

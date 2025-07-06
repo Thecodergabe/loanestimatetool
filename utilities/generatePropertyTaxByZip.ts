@@ -2,11 +2,9 @@ import * as path from 'path'
 import * as fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import * as readline from 'readline'
-import { load } from "cheerio"
-import * as Papa from 'papaparse'
+import { load } from 'cheerio'
 
-type ZipCountyRow = { ZIP: string; County: string; State: string }
-
+type ZipCountyRow = { ZIP: string, County: string, State: string }
 
 const ZIP_CSV_URL = 'https://raw.githubusercontent.com/scpike/us-state-county-zip/master/geo-data.csv'
 const ZIP_CSV_PATH = path.resolve(process.cwd(), 'data', 'zip_to_county.csv')
@@ -130,7 +128,8 @@ export async function generatePropertyTaxByZip(): Promise<TaxRateMap> {
       const rate = countyRates[key]
       if (rate !== undefined) {
         zipTaxMap[row.ZIP] = rate
-      } else {
+      }
+      else {
         unmatched.push(`${row.ZIP},${row.State},${row.County} → ${key}`)
       }
     }
@@ -140,11 +139,12 @@ export async function generatePropertyTaxByZip(): Promise<TaxRateMap> {
       console.warn(`⚠️ ${unmatched.length} unmatched ZIPs written to unmatched-zip-keys.txt`)
     }
 
-   await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })
+    await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })
     await fs.writeFile(OUTPUT_PATH, JSON.stringify(zipTaxMap, null, 2))
 
     return zipTaxMap
-  } catch (err) {
+  }
+  catch (err) {
     console.error('❌ Failed to generate ZIP tax data:', err)
     throw err
   }

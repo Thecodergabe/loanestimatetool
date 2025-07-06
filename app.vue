@@ -1,5 +1,5 @@
 <template>
-    <v-responsive>
+  <v-responsive>
     <v-app>
       <NuxtRouteAnnouncer />
       <v-main>
@@ -10,8 +10,7 @@
     </v-app>
   </v-responsive>
 </template>
-<script setup lang="ts">
 
-import { NuxtPage } from '#components';
+<script setup lang="ts">
 
 </script>

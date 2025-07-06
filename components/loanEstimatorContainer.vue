@@ -1,25 +1,33 @@
 <template>
-  <v-container fluid
-               class="d-flex flex-column flex-lg-row align-start ga-4">
+  <v-container
+    fluid
+    class="d-flex flex-column flex-lg-row align-start ga-4"
+  >
     <!-- Form Panel -->
     <div class="flex-grow-1 w-100 w-lg-auto">
-      <LoanForm v-model="loanData"
-                :zip-data-found="zipDataFound"
-                @see-results="scrollToId" />
+      <LoanForm
+        v-model="loanData"
+        :zip-data-found="zipDataFound"
+        @see-results="scrollToId"
+      />
     </div>
 
     <!-- Chart Panel -->
     <div class="mt-4 mt-md-0 w-100 w-lg-auto">
-      <LoanResultsChart id="results"
-                        :form="loanData" />
+      <LoanResultsChart
+        id="results"
+        :form="loanData"
+      />
     </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { LoanType, type LoanModel } from '../models/loanModel'
+import { LoanType } from '../models/loanModel'
+import type { LoanModel } from '../models/loanModel'
 import { useZipEstimates } from '../composables/useZipEstimate'
+
 const zipDataFound = ref(false)
 
 // This is the shared reactive state between form and results
@@ -35,9 +43,8 @@ const loanData = ref<LoanModel>({
   includePMI: false,
   taxRate: 1.2,
   insurance: 1200,
-  closingCosts: 3
+  closingCosts: 3,
 })
-
 
 watch(() => loanData.value.zip, async (zip) => {
   if (!zip || zip.length !== 5) return
@@ -51,7 +58,7 @@ watch(() => loanData.value.zip, async (zip) => {
 })
 
 const scrollToId = () => {
-  const el = document.getElementById("results")
+  const el = document.getElementById('results')
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
   }

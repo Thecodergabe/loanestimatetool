@@ -1,5 +1,6 @@
 declare module 'csv-parser' {
-  import { Transform } from 'stream'
+  import type { Transform } from 'stream'
+
   interface Options {
     headers?: string[]
     skipLines?: number

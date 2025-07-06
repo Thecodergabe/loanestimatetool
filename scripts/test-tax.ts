@@ -1,6 +1,6 @@
 import { generatePropertyTaxByZip } from '../utilities/generatePropertyTaxByZip.js'
 
 generatePropertyTaxByZip()
-  .catch(err => {
+  .catch((err) => {
     console.error('❌ Failed to generate ZIP tax data:', err)
   })

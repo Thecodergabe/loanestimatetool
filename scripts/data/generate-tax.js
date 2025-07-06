@@ -70,7 +70,9 @@ const generate = async () => {
     }
   }
 
-  await fs.writeFile(OUTPUT_PATH, JSON.stringify(zipTaxMap, null, 2))
+  await fs.writeFile(
+  OUTPUT_PATH,
+  JSON.stringify({ propertyTax: zipTaxMap, insurance: {} }, null, 2)
 }
 
 generate().catch((err) => {

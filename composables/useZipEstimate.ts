@@ -1,4 +1,4 @@
-import { useFetch } from "nuxt/app"
+import { useFetch } from 'nuxt/app'
 
 type ZipTaxMap = Record<string, number>
 
@@ -11,8 +11,8 @@ export async function useZipEstimates(zip: string) {
 
   const tax = rawTax !== null ? rawTax : null
   const insurance = rawInsurance !== null
-  ? Math.trunc((rawInsurance / 12) * 100) / 100
-  : null
+    ? Math.trunc((rawInsurance / 12) * 100) / 100
+    : null
 
   return { tax, insurance }
 }

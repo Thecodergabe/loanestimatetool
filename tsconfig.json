@@ -10,5 +10,6 @@
     "strict": true,
     "outDir": "dist"
   },
-  "include": ["types", "scripts", "utilities"]
+  "extends": "./.nuxt/tsconfig.json",
+  "include": ["types", "scripts", "utilities", "**/*", ".nuxt", "nuxt.config.ts"]
 }

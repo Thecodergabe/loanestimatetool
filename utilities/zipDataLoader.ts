@@ -1,5 +1,4 @@
 import fsp from 'fs/promises'
-import fs from 'fs'
 import path from 'path'
 import { scrapeInsuranceRates } from './scrapeInsuranceRates.js'
 import { generatePropertyTaxByZip } from './generatePropertyTaxByZip.js'
@@ -17,12 +16,13 @@ const dataPath = (file: string) => path.resolve(process.cwd(), 'data', file)
 
 async function ensureDataFile<T>(
   filename: string,
-  generator: () => Promise<T>
+  generator: () => Promise<T>,
 ): Promise<T> {
   try {
     const raw = await fsp.readFile(dataPath(filename), 'utf-8')
     return JSON.parse(raw)
-  } catch {
+  }
+  catch {
     const data = await generator()
     await fsp.mkdir(path.dirname(dataPath(filename)), { recursive: true })
     await fsp.writeFile(dataPath(filename), JSON.stringify(data, null, 2))
@@ -36,7 +36,7 @@ export async function getZipData(): Promise<ZipData> {
 
   const [propertyTax, insurance] = await Promise.all([
     ensureDataFile('propertyTaxByZip.json', generatePropertyTaxByZip),
-    ensureDataFile('insuranceByZip.json', scrapeInsuranceRates)
+    ensureDataFile('insuranceByZip.json', scrapeInsuranceRates),
   ])
 
   cache = { propertyTax, insurance }

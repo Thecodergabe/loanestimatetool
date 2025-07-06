@@ -8,7 +8,7 @@ const OUTPUT_PATH = path.resolve(process.cwd(), 'public', 'insuranceByZip.json')
 async function convertXlsxToJson() {
   const workbook = xlsx.readFile(INPUT_PATH)
   const sheet = workbook.Sheets[workbook.SheetNames[0]]
-  const rows = xlsx.utils.sheet_to_json<Record<string, any>>(sheet)
+  const rows = xlsx.utils.sheet_to_json<Record<string, unknown>>(sheet)
 
   const result: Record<string, number> = {}
 
@@ -22,7 +22,8 @@ async function convertXlsxToJson() {
 
     if (/^\d{5}$/.test(zip) && !isNaN(premium)) {
       result[zip] = parseFloat(premium.toFixed(2))
-    } else {
+    }
+    else {
       console.warn(`⚠️ Skipped invalid row: ZIP=${zip}, Premium=${premiumRaw}`)
     }
   }
@@ -32,7 +33,7 @@ async function convertXlsxToJson() {
   console.log(`✅ Wrote ${Object.keys(result).length} ZIP-level insurance rates to ${OUTPUT_PATH}`)
 }
 
-convertXlsxToJson().catch(err => {
+convertXlsxToJson().catch((err) => {
   console.error('❌ Failed to convert Excel file:', err)
   process.exit(1)
 })

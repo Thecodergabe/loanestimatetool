@@ -6,7 +6,7 @@ const OUTPUT_PATH = path.resolve(process.cwd(), 'data', 'insuranceByZip.json')
 const SOURCE_URL = 'https://www.policygenius.com/homeowners-insurance/home-insurance-rates-by-zip-code/'
 
 export async function scrapeInsuranceRates(): Promise<Record<string, number>> {
- const res = await fetch(SOURCE_URL)
+  const res = await fetch(SOURCE_URL)
   if (!res.ok) throw new Error(`Failed to fetch Policygenius page: ${res.statusText}`)
 
   const html = await res.text()
@@ -21,7 +21,8 @@ export async function scrapeInsuranceRates(): Promise<Record<string, number>> {
 
     if (/^\d{5}$/.test(zip) && !isNaN(cost)) {
       results[zip] = cost
-    } else {
+    }
+    else {
       console.warn(`⚠️ Skipped invalid row: ZIP=${zip}, Cost=${costStr}`)
     }
   })

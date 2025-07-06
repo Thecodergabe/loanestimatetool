@@ -12,7 +12,7 @@ export const useTooltip = () => {
     includePMI: 'Private Mortgage Insurance is typically required when the down payment is less than 20%.',
     taxRate: 'The annual property tax rate in your area, used to calculate estimated escrow payments.',
     insurance: 'An annual estimate of your home insurance premium—commonly required by lenders.',
-    closingCosts: 'Anticipated one-time costs at settlement, typically 2–5% of the home purchase price.'
+    closingCosts: 'Anticipated one-time costs at settlement, typically 2–5% of the home purchase price.',
   }
 
   const getTooltip = (key: keyof typeof tooltips) => tooltips[key] || ''
