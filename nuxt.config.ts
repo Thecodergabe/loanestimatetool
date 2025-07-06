@@ -3,10 +3,14 @@ import { defineNuxtConfig } from 'nuxt/config'
 import compression from 'vite-plugin-compression2'
 
 export default defineNuxtConfig({
-  // Ensures compatibility with Cloudflare Pages runtime
-
   modules: [
-    // Vuetify integration via Vite plugin
+    [
+      'nuxt-delay-hydration',
+      {
+        mode: 'mount',
+        debug: process.env.NODE_ENV === 'development',
+      },
+    ],
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins ||= []
@@ -14,8 +18,25 @@ export default defineNuxtConfig({
       })
     },
   ],
+
   app: {
-    buildAssetsDir: '/_nuxt/', // optional: ensure asset path is correct
+    buildAssetsDir: '/_nuxt/',
+    head: {
+      title: 'Loan Estimate Tool',
+      htmlAttrs: {
+        lang: 'en',
+      },
+      meta: [
+        { name: 'description', content: 'Instant ZIP-level insurance and tax estimates for mortgage planning.' },
+        { property: 'og:title', content: 'Loan Estimate Tool' },
+        { property: 'og:description', content: 'Get ZIP-specific insurance and tax estimates instantly.' },
+        { property: 'og:image', content: 'https://yourdomain.com/og-image.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      ],
+    },
   },
 
   plugins: [
@@ -45,12 +66,13 @@ export default defineNuxtConfig({
 
   experimental: {
     appManifest: false,
-    payloadExtraction: true, // ✅ Reduces JS payload size for prerendered pages
+    payloadExtraction: true,
   },
+
   compatibilityDate: '2025-05-15',
+
   nitro: {
     compressPublicAssets: true,
-    // preset: 'node',
     preset: 'cloudflare-pages',
     serveStatic: true,
     static: true,
@@ -64,13 +86,13 @@ export default defineNuxtConfig({
     },
     plugins: [
       vuetify({ autoImport: true }),
-      compression({ algorithms: ['brotliCompress'] })
+      compression({ algorithms: ['brotliCompress'] }),
     ],
     define: {
       'process.env.DEBUG': false,
     },
     build: {
-      minify: 'esbuild', // ✅ Use esbuild for faster, safer JS minification
+      minify: 'esbuild',
     },
   },
 })
