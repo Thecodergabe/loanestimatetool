@@ -1,6 +1,6 @@
 <template>
   <v-responsive>
-    <v-app>
+    <v-app class="bg-background">
       <NuxtRouteAnnouncer />
       <v-main>
         <v-container>

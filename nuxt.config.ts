@@ -61,7 +61,17 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': { prerender: true },
+    '/': {
+      prerender: true,
+      headers: {
+        'x-robots-tag': 'index, follow',
+      },
+    },
+    '/**': {
+      headers: {
+        'x-robots-tag': 'index, follow',
+      },
+    },
   },
 
   experimental: {
