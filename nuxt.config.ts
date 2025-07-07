@@ -18,7 +18,6 @@ export default defineNuxtConfig({
       Sitemap: 'https://loanestimatetool.com/sitemap.xml',
     },
   },
-
   app: {
     buildAssetsDir: '/_nuxt/',
     head: {
@@ -64,6 +63,7 @@ export default defineNuxtConfig({
   experimental: {
     appManifest: false,
     payloadExtraction: true,
+    emitRouteChunkError: false, // fallback to full reload
   },
 
   compatibilityDate: '2025-05-15',
