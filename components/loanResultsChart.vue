@@ -62,7 +62,7 @@
              aria-label="Download Amortization Schedule"
              :block="mobile"
              @click="downloadSchedule">
-        Download Amortization Schedule
+        {{ mobile ? 'Download Amortization' : 'Download Amortization Schedule' }}
       </v-btn>
     </v-card-actions>
   </v-card>
