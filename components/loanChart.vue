@@ -1,19 +1,15 @@
 <template>
   <div class="chart-container">
-    <v-skeleton-loader
-      v-if="!showChart"
-      type="image"
-      class="rounded-lg"
-      height="300"
-    />
-    <component
-      :is="currentChartComponent"
-      v-else
-      key="chart"
-      :data="currentChartData"
-      :options="currentChartOptions"
-      :plugins="currentChartPlugins"
-    />
+    <v-skeleton-loader v-if="!showChart"
+                       type="image"
+                       class="rounded-lg"
+                       height="300" />
+    <component :is="currentChartComponent"
+               v-else
+               key="chart"
+               :data="currentChartData"
+               :options="currentChartOptions"
+               :plugins="currentChartPlugins" />
   </div>
 </template>
 

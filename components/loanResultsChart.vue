@@ -9,10 +9,13 @@
                     density="compact"
                     class="ml-4">
         <v-btn value="donut"
+               aria-label="View donut chart"
                icon="mdi-chart-donut" />
         <v-btn value="line"
+               aria-label="View line chart"
                icon="mdi-chart-line" />
         <v-btn value="balance"
+               aria-label="View balance chart"
                icon="mdi-finance" />
       </v-btn-toggle>
     </v-card-title>
@@ -49,12 +52,14 @@
                 density="compact"
                 variant="solo"
                 hide-details
-                :style="[!mobile ? 'max-width: 150px' : 'width: 100%']"
+                :aria-label="`Export in format ${exportFormat}`"
+                :style="inputStyle"
                 class="me-lg-4"
                 :block="mobile" />
       <v-btn class="me-lg-4"
              variant="outlined"
              color="primary"
+             aria-label="Download Amortization Schedule"
              :block="mobile"
              @click="downloadSchedule">
         Download Amortization Schedule
@@ -73,6 +78,11 @@ import LoanChart from './loanChart.vue'
 import { useDisplay } from 'vuetify'
 
 const { downloadAmortizationPDF } = useAmortizationPDF()
+const inputStyle = computed(() =>
+  mobile.value
+    ? { width: '100%' }
+    : { maxWidth: '150px' }
+)
 
 const { mobile } = useDisplay()
 const props = defineProps<{ form: LoanModel }>()

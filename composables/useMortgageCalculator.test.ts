@@ -1,18 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import { ref } from 'vue'
-import { useMortgageCalculator } from './useMortgageCalculator'
-import type { LoanModel } from '../models/loanModel'
-import { LoanType } from '../models/loanModel'
+import { useMortgageCalculator } from './useMortgageCalculator.js'
+import type { LoanModel } from '../models/loanModel.js'
+import { LoanType } from '../models/loanModel.js'
 
 describe('useMortgageCalculator (unit)', () => {
-  it('calculates principal and monthly payment for conventional loan', () => {
+  it('calculates principal and monthly payment for  loan', () => {
     const form = ref<LoanModel>({
       purchasePrice: 500000,
       downPayment: 20,
       term: 30,
       rate: 6.5,
       zip: '97229',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 120,
       points: 0,
       includePMI: false,
@@ -33,7 +33,7 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.0,
       zip: '30303',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 80,
       points: 2,
       includePMI: false,
@@ -75,7 +75,7 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.25,
       zip: '90210',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 200,
       points: 0,
       includePMI: false,
@@ -96,7 +96,7 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 5.75,
       zip: '60614',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 90,
       points: 1,
       includePMI: false,
@@ -116,7 +116,7 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.0,
       zip: '85001',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 100,
       points: 0,
       includePMI: true,
@@ -166,7 +166,7 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 0.25,
       zip: '60614',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 90,
       points: 2,
       includePMI: false,

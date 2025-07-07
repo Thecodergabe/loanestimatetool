@@ -14,7 +14,7 @@ export interface LoanModel {
 }
 
 export enum LoanType {
-  Conventional = 'Conventional',
+  CONV = 'CONV',
   FHA = 'FHA',
   VA = 'VA',
   USDA = 'USDA',
