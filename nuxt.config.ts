@@ -1,37 +1,89 @@
+import { defineNuxtConfig } from 'nuxt/config'
+import compression from 'vite-plugin-compression2'
 
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
-  devtools: { enabled: true },
-    build: {
+  modules: ['vuetify-nuxt-module', '@nuxtjs/sitemap', '@nuxtjs/robots', ['nuxt-delay-hydration', {
+    mode: 'mount',
+    debug: process.env.NODE_ENV === 'development',
+  }], '@nuxtjs/sitemap'],
+
+  runtimeConfig: {
+    public: {
+      siteUrl: 'https://loanestimatetool.com',
+      
+    },
+    robots: {
+      UserAgent: '*',
+      Disallow: '',
+      Sitemap: 'https://loanestimatetool.com/sitemap.xml',
+    },
+  },
+
+  app: {
+    buildAssetsDir: '/_nuxt/',
+    head: {
+      title: 'Loan Estimate Tool',
+      htmlAttrs: { lang: 'en' },
+      meta: [
+        { name: 'description', content: 'Instant ZIP-level insurance and tax estimates for mortgage planning.' },
+        { property: 'og:title', content: 'Loan Estimate Tool' },
+        { property: 'og:description', content: 'Get ZIP-specific insurance and tax estimates instantly.' },
+        { property: 'og:image', content: 'https://loanestimatetool.com/og-image.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    },
+  },
+
+  plugins: [
+    { src: './plugins/initZipData.server.ts', mode: 'server' },
+  ],
+
+  css: [
+    '@mdi/font/css/materialdesignicons.min.css',
+  ],
+
+  build: {
     transpile: ['vuetify'],
   },
-    modules: [
-    (_options, nuxt) => {
-      nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
+
+  routeRules: {
+    '/': {
+      prerender: true,
+      headers: {
+        'x-robots-tag': 'index, follow',
+      },
     },
-    '@nuxt/eslint',
-    '@nuxt/fonts',
-    '@nuxt/icon',
-    '@nuxt/image',
-    '@nuxt/test-utils'
-  ],
-  css: ['vuetify/styles','@mdi/font/css/materialdesignicons.min.css'],
-  plugins: ['~/plugins/vuetify.ts'],
-  vite: {
-    vue: {
-      template: {
-        transformAssetUrls,
+    '/**': {
+      headers: {
+        'x-robots-tag': 'index, follow',
       },
     },
   },
-  nitro: {
-    preset: 'cloudflare-pages',
-    serveStatic: true
+
+  experimental: {
+    appManifest: false,
+    payloadExtraction: true,
   },
-  ssr: true,
+
+  compatibilityDate: '2025-05-15',
+
+  nitro: {
+    compressPublicAssets: true,
+    preset: 'cloudflare-pages',
+    serveStatic: true,
+    static: true,
+  },
+
+  vite: {
+    plugins: [
+      compression({ algorithms: ['brotliCompress'] }),
+    ],
+    define: {
+      'process.env.DEBUG': false,
+    },
+    build: {
+      minify: 'esbuild',
+    },
+  },
 })

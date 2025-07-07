@@ -1,24 +1,24 @@
 import { describe, it, expect } from 'vitest'
 import { ref } from 'vue'
-import { useMortgageCalculator } from './useMortgageCalculator'
-import type { LoanModel } from '../models/loanModel'
-import { LoanType } from '../models/loanModel'
+import { useMortgageCalculator } from './useMortgageCalculator.js'
+import type { LoanModel } from '../models/loanModel.js'
+import { LoanType } from '../models/loanModel.js'
 
 describe('useMortgageCalculator (unit)', () => {
-  it('calculates principal and monthly payment for conventional loan', () => {
+  it('calculates principal and monthly payment for  loan', () => {
     const form = ref<LoanModel>({
       purchasePrice: 500000,
       downPayment: 20,
       term: 30,
       rate: 6.5,
       zip: '97229',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 120,
       points: 0,
       includePMI: false,
       taxRate: 1.25,
       insurance: 1500,
-      closingCosts: 3
+      closingCosts: 3,
     })
 
     const { principal, monthlyPayment } = useMortgageCalculator(form)
@@ -33,13 +33,13 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.0,
       zip: '30303',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 80,
       points: 2,
       includePMI: false,
       taxRate: 1.0,
       insurance: 1100,
-      closingCosts: 2.5
+      closingCosts: 2.5,
     })
 
     const { effectiveRate } = useMortgageCalculator(form)
@@ -59,7 +59,7 @@ describe('useMortgageCalculator (unit)', () => {
       includePMI: true,
       taxRate: 1.4,
       insurance: 1300,
-      closingCosts: 3.5
+      closingCosts: 3.5,
     })
 
     const { pmi } = useMortgageCalculator(form)
@@ -75,13 +75,13 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.25,
       zip: '90210',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 200,
       points: 0,
       includePMI: false,
       taxRate: 1.5,
       insurance: 1800,
-      closingCosts: 2
+      closingCosts: 2,
     })
 
     const { taxes, insurance } = useMortgageCalculator(form)
@@ -96,13 +96,13 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 5.75,
       zip: '60614',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 90,
       points: 1,
       includePMI: false,
       taxRate: 1.1,
       insurance: 1600,
-      closingCosts: 2.5
+      closingCosts: 2.5,
     })
 
     const { closingCosts } = useMortgageCalculator(form)
@@ -116,13 +116,13 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 6.0,
       zip: '85001',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 100,
       points: 0,
       includePMI: true,
       taxRate: 1.3,
       insurance: 1400,
-      closingCosts: 3
+      closingCosts: 3,
     })
 
     const {
@@ -131,7 +131,7 @@ describe('useMortgageCalculator (unit)', () => {
       insurance,
       pmi,
       hoa,
-      totalMonthly
+      totalMonthly,
     } = useMortgageCalculator(form)
 
     const expectedTotal = monthlyPayment.value + taxes.value + insurance.value + pmi.value + hoa.value
@@ -151,7 +151,7 @@ describe('useMortgageCalculator (unit)', () => {
       includePMI: false,
       taxRate: 1.3,
       insurance: 1600,
-      closingCosts: 2.5
+      closingCosts: 2.5,
     })
 
     const { upfrontCost } = useMortgageCalculator(form)
@@ -166,13 +166,13 @@ describe('useMortgageCalculator (unit)', () => {
       term: 30,
       rate: 0.25,
       zip: '60614',
-      loanType: LoanType.Conventional,
+      loanType: LoanType.CONV,
       hoa: 90,
       points: 2,
       includePMI: false,
       taxRate: 1.1,
       insurance: 1000,
-      closingCosts: 3
+      closingCosts: 3,
     })
 
     const { effectiveRate } = useMortgageCalculator(form)
@@ -192,7 +192,7 @@ describe('useMortgageCalculator (unit)', () => {
       includePMI: false,
       taxRate: 1.0,
       insurance: 900,
-      closingCosts: 2
+      closingCosts: 2,
     })
 
     const { monthlyPayment } = useMortgageCalculator(form)

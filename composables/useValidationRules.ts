@@ -1,7 +1,7 @@
 // composables/useValidationRules.ts
 export const useValidationRules = () => {
-  const required = (v: any) => !!v || 'This field is required'
-  const number = (v: any) => !isNaN(v) || 'Must be a number'
+  const required = (v: unknown) => !!v || 'This field is required'
+  const number = (v: number) => !isNaN(v) || 'Must be a number'
   const positive = (v: number) => (v > 0) || 'Must be greater than 0'
   const percent = (v: number) =>
     (v >= 0 && v <= 100) || 'Must be between 0 and 100'
@@ -26,6 +26,6 @@ export const useValidationRules = () => {
     currency,
     zip,
     optionalPercent,
-    optionalPositive
+    optionalPositive,
   }
 }
