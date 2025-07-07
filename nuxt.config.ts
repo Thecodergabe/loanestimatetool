@@ -18,6 +18,9 @@ export default defineNuxtConfig({
       Sitemap: 'https://loanestimatetool.com/sitemap.xml',
     },
   },
+  experimental: {
+    emitRouteChunkError: false, // fallback to full reload
+  },
   app: {
     buildAssetsDir: '/_nuxt/',
     head: {
