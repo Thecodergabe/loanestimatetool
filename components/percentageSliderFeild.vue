@@ -73,7 +73,7 @@ const { mobile } = useDisplay()
 const labelId = computed(() => `${inputId.value}-label`)
 const inputStyle = computed(() =>
   !mobile.value
-    ? { minWidth: '80px' }
+    ? { minWidth: 'max-content' }
     : { maxWidth: '100%' }
 )
 
