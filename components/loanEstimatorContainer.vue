@@ -12,27 +12,28 @@
       <LoanResultsChart id="results"
                         :form="loanData" />
     </div>
-    <v-btn v-show="mobile"
-           class="position-fixed bottom-0 left-0 w-100 rounded-0"
-           variant="elevated"
-           color="primary"
-           block
-           @click="scrollToId"
-           aria-label="Submit form and see mortgage estimate">
+    <v-btn v-show="mobile && !isAtBottom"
+         class="position-fixed bottom-0 left-0 w-100 rounded-0"
+         variant="elevated"
+         color="primary"
+         block
+         @click="scrollToId"
+         aria-label="Submit form and see mortgage estimate">
       See Estimate
     </v-btn>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { LoanType } from '../models/loanModel'
 import type { LoanModel } from '../models/loanModel'
 import { useDisplay } from 'vuetify'
 import { useZipEstimates } from '../composables/useZipEstimate'
+import { on } from 'events'
 const { mobile } = useDisplay()
 const zipDataFound = ref(false)
-
+const isAtBottom = ref(false)
 // This is the shared reactive state between form and results
 const loanData = ref<LoanModel>({
   purchasePrice: 500000,
@@ -66,6 +67,24 @@ const scrollToId = () => {
     el.scrollIntoView({ behavior: 'smooth' })
   }
 }
+
+onMounted(() => {
+  // Check if we're already at the bottom on mount
+  handleScroll()
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+const handleScroll = () => {
+  const el = document.getElementById('results')
+  if (el) {
+    const rect = el.getBoundingClientRect()
+    isAtBottom.value = rect.bottom <= window.innerHeight
+  }
+}
+
 </script>
 
 <style scoped></style>

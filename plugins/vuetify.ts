@@ -2,7 +2,6 @@
 import { defineNuxtPlugin } from 'nuxt/app'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.min.css'
 
 import {
   VApp, VAppBar, VBtn, VCard, VContainer, VDivider,
@@ -13,8 +12,6 @@ import {
 import {
   Ripple, Intersect, Scroll,
 } from 'vuetify/directives'
-
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
@@ -29,8 +26,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     icons: {
       defaultSet: 'mdi',
-      aliases,
-      sets: { mdi },
     },
     theme: {
       defaultTheme: 'light',

@@ -1,22 +1,17 @@
-// composables/useLoanChart.ts
-import type { Ref } from 'vue'
 import { computed } from 'vue'
-import ChartDataLabels from 'chartjs-plugin-datalabels'
-import type { ChartOptions, Plugin } from 'chart.js'
-import type { AmortizationEntry } from '../types/loan'
-import { useMortgageCalculator } from './useMortgageCalculator'
-import type { LoanModel } from '../models/loanModel'
+import type { Ref } from 'vue'
+import type { ChartData, ChartOptions } from 'chart.js'
+import type { AmortizationEntry } from '../types/loan.js'
+import { useMortgageCalculator } from './useMortgageCalculator.js'
+import type { LoanModel } from '../models/loanModel.js'
 
-export function useLoanChart(form: Ref<LoanModel>, schedule: Ref<AmortizationEntry[]>) {
-  const {
-    monthlyPayment,
-    taxes,
-    insurance,
-    pmi,
-    hoa,
-  } = useMortgageCalculator(form)
+export function useLoanChart(
+  form: Ref<LoanModel>,
+  schedule: Ref<AmortizationEntry[]>
+) {
+  const { monthlyPayment, taxes, insurance, pmi, hoa } = useMortgageCalculator(form)
 
-  const donutData = computed(() => ({
+  const donutData = computed<ChartData<'doughnut'>>(() => ({
     labels: ['Principal + Interest', 'Taxes', 'Insurance', 'PMI', 'HOA'],
     datasets: [
       {
@@ -25,50 +20,47 @@ export function useLoanChart(form: Ref<LoanModel>, schedule: Ref<AmortizationEnt
           taxes.value,
           insurance.value,
           pmi.value,
-          hoa.value,
+          hoa.value
         ],
-        backgroundColor: ['#1976D2', '#4CAF50', '#FFC107', '#E91E63', '#9C27B0'],
-      },
-    ],
-    options: {
-      animation: false,
-    },
+        backgroundColor: ['#1976D2', '#4CAF50', '#FFC107', '#E91E63', '#9C27B0']
+      }
+    ]
   }))
 
-  const lineData = computed(() => ({
+  const lineData = computed<ChartData<'line'>>(() => ({
     labels: schedule.value.map(p => `Month ${p.month}`),
     datasets: [
       {
         label: 'Principal Paid',
         data: schedule.value.map(p => p.principalPaid),
         borderColor: '#4CAF50',
-        fill: false,
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false
       },
       {
         label: 'Interest Paid',
         data: schedule.value.map(p => p.interest),
         borderColor: '#E91E63',
-        fill: false,
-      },
-    ],
-    options: {
-      animation: false,
-    },
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false
+      }
+    ]
   }))
 
-  const balanceData = computed(() => ({
+  const balanceData = computed<ChartData<'line'>>(() => ({
     labels: schedule.value.map(p => `Month ${p.month}`),
     datasets: [
       {
         label: 'Remaining Balance',
         data: schedule.value.map(p => p.balance),
         borderColor: '#1976D2',
-        fill: false,
-      },
-    ],
-    options: {
-      animation: false,
-    },
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false
+      }
+    ]
   }))
 
   const donutOptions: ChartOptions<'doughnut'> = {
@@ -78,12 +70,39 @@ export function useLoanChart(form: Ref<LoanModel>, schedule: Ref<AmortizationEnt
       datalabels: {
         color: '#fff',
         font: { weight: 'bold' },
-        formatter: (value: number) => `$${value.toFixed(0)}`,
+        formatter: (value: number) => `$${value.toFixed(0)}`
       },
-      legend: {
-        position: 'bottom',
-      },
+      legend: { position: 'bottom' }
+    }
+  }
+
+  const lineOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    plugins: {
+      legend: { position: 'bottom' }
     },
+    elements: {
+      line: { borderWidth: 2 },
+      point: { radius: 2 }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Month' } },
+      y: { title: { display: true, text: 'Amount ($)' } }
+    }
+  }
+
+  const balanceOptions: ChartOptions<'line'> = {
+    ...lineOptions,
+    plugins: {
+      ...lineOptions.plugins,
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `Balance: $${ctx.parsed.y.toFixed(2)}`
+        }
+      }
+    }
   }
 
   return {
@@ -91,6 +110,7 @@ export function useLoanChart(form: Ref<LoanModel>, schedule: Ref<AmortizationEnt
     lineData,
     balanceData,
     donutOptions,
-    ChartDataLabels: ChartDataLabels as Plugin<'doughnut'>,
+    lineOptions,
+    balanceOptions
   }
 }

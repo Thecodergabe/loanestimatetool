@@ -1,15 +1,31 @@
 <template>
   <div class="chart-container">
-    <v-skeleton-loader v-if="!showChart"
-                       type="image"
-                       class="rounded-lg"
-                       height="300" />
-    <component :is="currentChartComponent"
-               v-else
-               key="chart"
-               :data="currentChartData"
-               :options="currentChartOptions"
-               :plugins="currentChartPlugins" />
+    <v-skeleton-loader
+      v-if="!showChart"
+      type="image"
+      class="rounded-lg"
+      height="300"
+    />
+    <ClientOnly>
+      <Doughnut
+        v-if="showChart && props.chartType === 'donut'"
+        key="donut"
+        :data="donutData"
+        :options="donutOptions"
+      />
+      <Line
+        v-else-if="props.chartType === 'line'"
+        key="line"
+        :data="lineData"
+        :options="lineOptions"
+      />
+      <Line
+        v-else-if="props.chartType === 'balance'"
+        key="balance"
+        :data="balanceData"
+        :options="balanceOptions"
+      />
+    </ClientOnly>
   </div>
 </template>
 
@@ -18,6 +34,7 @@ import { ref, computed, defineAsyncComponent, onMounted } from 'vue'
 import { useLoanChart } from '../composables/useLoanChart'
 import type { LoanModel } from '../models/loanModel'
 import type { AmortizationEntry } from '../types/loan'
+import type { ChartData, ChartOptions } from 'chart.js'
 
 const props = defineProps<{
   form: LoanModel
@@ -33,10 +50,10 @@ onMounted(() => {
 })
 
 const Doughnut = defineAsyncComponent(() =>
-  import('vue-chartjs').then(m => m.Doughnut),
+  import('vue-chartjs').then(m => m.Doughnut)
 )
 const Line = defineAsyncComponent(() =>
-  import('vue-chartjs').then(m => m.Line),
+  import('vue-chartjs').then(m => m.Line)
 )
 
 const formRef = ref(props.form)
@@ -47,31 +64,14 @@ const {
   lineData,
   balanceData,
   donutOptions,
-  ChartDataLabels,
+  lineOptions,
+  balanceOptions
 } = useLoanChart(formRef, scheduleRef)
 
-const currentChartComponent = computed(() => {
-  return props.chartType === 'donut' ? Doughnut : Line
-})
-
-const currentChartData = computed(() => {
-  if (props.chartType === 'donut') return donutData.value
-  return props.chartType === 'line' ? lineData.value : balanceData.value
-})
-
-const currentChartOptions = computed(() => {
-  return props.chartType === 'donut' ? donutOptions : undefined
-})
-
-const currentChartPlugins = computed(() => {
-  return props.chartType === 'donut' ? [ChartDataLabels] : undefined
-})
 </script>
 
 <style scoped>
 .chart-container {
-  height: auto;
-
   min-height: 300px;
   content-visibility: auto;
   contain-intrinsic-size: 300px;

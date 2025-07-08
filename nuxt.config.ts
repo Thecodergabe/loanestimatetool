@@ -1,16 +1,19 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import compression from 'vite-plugin-compression2'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineNuxtConfig({
-  modules: ['vuetify-nuxt-module', '@nuxtjs/sitemap', '@nuxtjs/robots', ['nuxt-delay-hydration', {
-    mode: 'mount',
-    debug: process.env.NODE_ENV === 'development',
-  }], '@nuxtjs/sitemap'],
+  ssr: false,
+
+  modules: [
+    'vuetify-nuxt-module',
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots'
+  ],
 
   runtimeConfig: {
     public: {
       siteUrl: 'https://loanestimatetool.com',
-      
     },
     robots: {
       UserAgent: '*',
@@ -18,6 +21,7 @@ export default defineNuxtConfig({
       Sitemap: 'https://loanestimatetool.com/sitemap.xml',
     },
   },
+
   app: {
     buildAssetsDir: '/_nuxt/',
     head: {
@@ -34,10 +38,17 @@ export default defineNuxtConfig({
         {
           src: 'https://static.cloudflareinsights.com/beacon.min.js',
           defer: true,
+          crossorigin: 'anonymous',
           'data-cf-beacon': '{"token": "98597ea9061a444ba0b2b9b572e8651b"}'
         }
       ],
-      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        {
+          rel: 'stylesheet',
+          href: 'https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css'
+        }
+      ],
     },
   },
 
@@ -46,7 +57,7 @@ export default defineNuxtConfig({
   ],
 
   css: [
-    '@mdi/font/css/materialdesignicons.min.css',
+    'vuetify/styles'
   ],
 
   build: {
@@ -59,22 +70,17 @@ export default defineNuxtConfig({
       headers: {
         'x-robots-tag': 'index, follow',
       },
-    },
-    '/**': {
-      headers: {
-        'x-robots-tag': 'index, follow',
-      },
-    },
+    }
   },
 
   experimental: {
     appManifest: false,
     payloadExtraction: true,
-    emitRouteChunkError: false, // fallback to full reload
+    emitRouteChunkError: false,
   },
 
   compatibilityDate: '2025-05-15',
-  ssr: false,
+
   nitro: {
     compressPublicAssets: true,
     preset: 'cloudflare-pages',
@@ -85,12 +91,24 @@ export default defineNuxtConfig({
   vite: {
     plugins: [
       compression({ algorithms: ['brotliCompress'] }),
+      ...(process.env.NODE_ENV === 'development' ? [visualizer({ open: false, filename: 'dist/stats.html' })] : [])
     ],
+    
     define: {
       'process.env.DEBUG': false,
     },
     build: {
       minify: 'esbuild',
-    },
-  },
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('vuetify')) return 'vuetify'
+              if (id.includes('chart.js')) return 'chartjs'
+            }
+          }
+        }
+      }
+    }
+  }
 })

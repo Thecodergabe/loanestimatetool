@@ -50,7 +50,7 @@
                 :items="['CSV', 'PDF']"
                 label="Export Format"
                 density="compact"
-                variant="solo"
+                variant="outlined"
                 hide-details
                 :aria-label="`Export in format ${exportFormat}`"
                 :style="inputStyle"
