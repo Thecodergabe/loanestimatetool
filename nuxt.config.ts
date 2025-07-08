@@ -30,6 +30,13 @@ export default defineNuxtConfig({
         { property: 'og:image', content: 'https://loanestimatetool.com/og-image.png' },
         { name: 'twitter:card', content: 'summary_large_image' },
       ],
+      script: [
+        {
+          src: 'https://static.cloudflareinsights.com/beacon.min.js',
+          defer: true,
+          'data-cf-beacon': '{"token": "98597ea9061a444ba0b2b9b572e8651b"}'
+        }
+      ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
   },
