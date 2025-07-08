@@ -76,6 +76,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
 
   nitro: {
+    ssr: false,
     compressPublicAssets: true,
     preset: 'cloudflare-pages',
     serveStatic: true,
