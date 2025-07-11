@@ -63,7 +63,7 @@ export default defineNuxtConfig({
         'x-robots-tag': 'index, follow',
       },
     },
-    '/loanguide': {
+    '/loanGuide': {
       prerender: true,
       headers: {
         'x-robots-tag': 'index, follow',
@@ -85,7 +85,7 @@ export default defineNuxtConfig({
     serveStatic: true,
     static: true,
     prerender: {
-      routes: ['/', '/loanguide', '/sitemap.xml'],
+      routes: ['/', '/loanGuide', '/sitemap.xml'],
     },
 
   },

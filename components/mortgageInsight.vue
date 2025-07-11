@@ -96,7 +96,7 @@
       <p class="text-body-2 mt-6 text-grey-darken-2"
          style="max-width: 600px;">
         📘 Want to dive deeper into FHA, VA, USDA, and jumbo loan types?
-        <a href="/loanguide"
+        <a href="/loanGuide"
            class="text-decoration-underline font-weight-medium">
           Read our full mortgage guide →
         </a>
