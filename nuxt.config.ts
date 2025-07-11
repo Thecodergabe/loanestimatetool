@@ -7,7 +7,6 @@ export default defineNuxtConfig({
 
   modules: [
     'vuetify-nuxt-module',
-    '@nuxtjs/sitemap',
     '@nuxtjs/robots'
   ],
 
@@ -85,7 +84,7 @@ export default defineNuxtConfig({
     serveStatic: true,
     static: true,
     prerender: {
-      routes: ['/', '/loanGuide', '/sitemap.xml'],
+      routes: ['/', '/loanGuide'],
     },
 
   },
