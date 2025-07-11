@@ -3,14 +3,17 @@
     <v-app class="bg-background">
       <NuxtRouteAnnouncer />
       <v-app-bar elevation="3"
-      color="primary"
+                 color="primary"
                  app>
-        <v-img :src="isDark ? '/logo_grey.png' : '/logo_light.png'"
-               height="85px"
-               width="190px"
-               max-width="190px"
-               alt="Logo for loan estimate tool"
-               aria-label="Logo for loan estimate tool" />
+        <a href="/"
+           aria-label="Home"
+           class="d-inline-flex align-center">
+          <v-img :src="isDark ? '/logo_grey.png' : '/logo_light.png'"
+                 height="85px"
+                 width="190px"
+                 max-width="190px"
+                 alt="Logo for loan estimate tool" />
+        </a>
         <v-spacer />
         <DarkModeToggle v-model="isDark" />
       </v-app-bar>

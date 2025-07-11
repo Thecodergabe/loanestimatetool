@@ -1,5 +1,5 @@
 import { defineNuxtPlugin } from 'nuxt/app'
-import { getZipData } from '../utilities/zipDataLoader'
+import { getZipData } from '../utilities/zipDataLoader.js'
 
 export default defineNuxtPlugin(async () => {
   try {

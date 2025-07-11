@@ -12,15 +12,17 @@
       <LoanResultsChart id="results"
                         :form="loanData" />
     </div>
-    <v-btn v-show="mobile && !isAtBottom"
-         class="position-fixed bottom-0 left-0 w-100 rounded-0"
-         variant="elevated"
-         color="primary"
-         block
-         @click="scrollToId"
-         aria-label="Submit form and see mortgage estimate">
+    <ScrollToBtn 
+                v-if="mobile"
+                 target="#results"
+                 behavior="smooth"
+                 color="primary"
+                 variant="elevated"
+                 size="large"
+                 block
+                 class="position-fixed bottom-0 left-0 w-100 rounded-0">
       See Estimate
-    </v-btn>
+    </ScrollToBtn>
   </v-container>
 </template>
 
@@ -30,7 +32,7 @@ import { LoanType } from '../models/loanModel'
 import type { LoanModel } from '../models/loanModel'
 import { useDisplay } from 'vuetify'
 import { useZipEstimates } from '../composables/useZipEstimate'
-import { on } from 'events'
+import ScrollToBtn from './scrollToBtn.vue'
 const { mobile } = useDisplay()
 const zipDataFound = ref(false)
 const isAtBottom = ref(false)
@@ -60,30 +62,6 @@ watch(() => loanData.value.zip, async (zip) => {
   if (tax !== null) loanData.value.taxRate = tax
   if (insurance !== null) loanData.value.insurance = insurance
 })
-
-const scrollToId = () => {
-  const el = document.getElementById('results')
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth' })
-  }
-}
-
-onMounted(() => {
-  // Check if we're already at the bottom on mount
-  handleScroll()
-  window.addEventListener('scroll', handleScroll)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-const handleScroll = () => {
-  const el = document.getElementById('results')
-  if (el) {
-    const rect = el.getBoundingClientRect()
-    isAtBottom.value = rect.bottom <= window.innerHeight
-  }
-}
 
 </script>
 

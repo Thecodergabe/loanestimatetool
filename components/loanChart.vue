@@ -30,11 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent, onMounted } from 'vue'
+import { ref, defineAsyncComponent, onMounted } from 'vue'
 import { useLoanChart } from '../composables/useLoanChart'
 import type { LoanModel } from '../models/loanModel'
 import type { AmortizationEntry } from '../types/loan'
-import type { ChartData, ChartOptions } from 'chart.js'
 
 const props = defineProps<{
   form: LoanModel

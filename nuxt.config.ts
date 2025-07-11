@@ -13,12 +13,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      siteUrl: 'https://loanestimatetool.com',
+      siteUrl: 'https://www.loanestimatetool.com',
     },
     robots: {
       UserAgent: '*',
       Disallow: '',
-      Sitemap: 'https://loanestimatetool.com/sitemap.xml',
+      Sitemap: 'https://www.loanestimatetool.com/sitemap.xml',
     },
   },
 
@@ -31,7 +31,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Instant ZIP-level insurance and tax estimates for mortgage planning.' },
         { property: 'og:title', content: 'Loan Estimate Tool' },
         { property: 'og:description', content: 'Get ZIP-specific insurance and tax estimates instantly.' },
-        { property: 'og:image', content: 'https://loanestimatetool.com/og-image.png' },
+        { property: 'og:image', content: 'https://www.loanestimatetool.com/og-image.png' },
         { name: 'twitter:card', content: 'summary_large_image' },
       ],
       link: [
@@ -56,13 +56,19 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
 
-  routeRules: {
+ routeRules: {
     '/': {
       prerender: true,
       headers: {
         'x-robots-tag': 'index, follow',
       },
-    }
+    },
+    '/loanguide': {
+      prerender: true,
+      headers: {
+        'x-robots-tag': 'index, follow',
+      },
+    },
   },
 
   experimental: {
@@ -78,6 +84,10 @@ export default defineNuxtConfig({
     preset: 'cloudflare-pages',
     serveStatic: true,
     static: true,
+    prerender: {
+      routes: ['/', '/loanguide', '/sitemap.xml'],
+    },
+
   },
 
   vite: {
