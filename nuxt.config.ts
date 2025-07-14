@@ -85,6 +85,7 @@ export default defineNuxtConfig({
     static: true,
     prerender: {
       routes: ['/', '/loanGuide'],
+      autoSubfolderIndex: false
     },
 
   },
