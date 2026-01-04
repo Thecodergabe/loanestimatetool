@@ -51,7 +51,7 @@
     <div class="d-flex flex-wrap justify-space-around gap-8">
       <v-card class="pa-4 d-flex flex-column"
               variant="outlined"
-              :style="mobile ? 'width: 100vw' : 'width: 40vw'">
+              :style="smAndDown ? 'width: 100vw' : 'width: 40vw'">
         <div class="d-flex justify-space-between align-center mb-2">
           <h3 class="text-subtitle-1 font-weight-bold">ZIP: 97229 – Portland, OR</h3>
           <v-chip color="info">Moderate Risk</v-chip>
@@ -64,7 +64,7 @@
 
       <v-card class="pa-4 d-flex mt-4 mt-md-0 flex-column"
               variant="outlined"
-              :style="mobile ? 'width: 100vw' : 'width: 40vw'">
+              :style="smAndDown ? 'width: 100vw' : 'width: 40vw'">
         <div class="d-flex justify-space-between align-center mb-2">
           <h3 class="text-subtitle-1 font-weight-bold">ZIP: 30301 – Atlanta, GA</h3>
           <v-chip color="warning">Tornado Zone</v-chip>
@@ -106,5 +106,5 @@
 </template>
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
-const { mobile } = useDisplay()
+const { smAndDown } = useDisplay()
 </script>

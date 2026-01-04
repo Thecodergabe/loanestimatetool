@@ -22,7 +22,7 @@
                 :aria-valuemin="min ?? 0"
                 :aria-valuemax="max"
                 :aria-valuenow="internalValue">
-        <template v-show="!mobile"
+        <template v-if="!smAndDown"
                   #prepend>
           <v-btn color="primary"
                  icon="mdi-minus"
@@ -32,7 +32,7 @@
                  @click="internalValue--" />
         </template>
 
-        <template v-show="!mobile"
+        <template v-if="!smAndDown"
                   #append>
           <v-btn color="primary"
                  icon="mdi-plus"
@@ -50,11 +50,12 @@
                     :max="max"
                     :min="min"
                     hide-details="auto"
+                    width="170px"
                     density="compact"
                     class="percent-input"
                     :aria-labelledby="`${inputId}-label`"
                     variant="filled"
-                    :block="mobile"
+                    :block="smAndDown"
                     :style="inputStyle" />
     </div>
 
@@ -69,10 +70,10 @@
 import { computed, toRefs } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const { mobile } = useDisplay()
+const { smAndDown } = useDisplay()
 const labelId = computed(() => `${inputId.value}-label`)
 const inputStyle = computed(() =>
-  !mobile.value
+  !smAndDown.value
     ? { minWidth: 'max-content' }
     : { maxWidth: '100%' }
 )
@@ -117,10 +118,11 @@ const internalValue = computed({
 :deep(.v-slider-thumb__label) {
   background-color: white;
   border: 1px solid #ccc;
+  color: black;
+  transform: scale(20);
   font-weight: 500;
 }
-</style>
-<style lang="css" scoped>
+
 .sr-only {
   position: absolute !important;
   height: 1px;

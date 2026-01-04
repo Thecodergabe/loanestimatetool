@@ -55,14 +55,14 @@
                 :aria-label="`Export in format ${exportFormat}`"
                 :style="inputStyle"
                 class="me-lg-4"
-                :block="mobile" />
+                :block="smAndDown" />
       <v-btn class="me-lg-4"
              variant="outlined"
              color="primary"
              aria-label="Download Amortization Schedule"
-             :block="mobile"
+             :block="smAndDown"
              @click="downloadSchedule">
-        {{ mobile ? 'Download Amortization' : 'Download Amortization Schedule' }}
+        {{ smAndDown ? 'Download Amortization' : 'Download Amortization Schedule' }}
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -79,12 +79,12 @@ import { useDisplay } from 'vuetify'
 
 const { downloadAmortizationPDF } = useAmortizationPDF()
 const inputStyle = computed(() =>
-  mobile.value
+  smAndDown.value
     ? { width: '100%' }
     : { maxWidth: '150px' }
 )
 
-const { mobile } = useDisplay()
+const { smAndDown } = useDisplay()
 const props = defineProps<{ form: LoanModel }>()
 const chartType = ref<'donut' | 'line' | 'balance'>('donut')
 const exportFormat = ref<'CSV' | 'PDF'>('CSV')

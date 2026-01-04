@@ -1,6 +1,5 @@
 <template>
-  <v-container fluid
-               class="d-flex flex-column flex-lg-row align-start ga-4 position-relative">
+  <div class="d-flex flex-column flex-lg-row align-start ga-4 position-relative pa-0 ma-0 pa-md-auto ma-md-auto">
     <!-- Form Panel -->
     <div class="flex-grow-1 w-100 w-lg-auto">
       <LoanForm v-model="loanData"
@@ -12,18 +11,18 @@
       <LoanResultsChart id="results"
                         :form="loanData" />
     </div>
-    <ScrollToBtn 
-                v-if="mobile"
+    <ScrollToBtn v-if="smAndDown"
                  target="#results"
                  behavior="smooth"
                  color="primary"
                  variant="elevated"
                  size="large"
                  block
+                 style="z-index: 1000"
                  class="position-fixed bottom-0 left-0 w-100 rounded-0">
       See Estimate
     </ScrollToBtn>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +32,7 @@ import type { LoanModel } from '../models/loanModel'
 import { useDisplay } from 'vuetify'
 import { useZipEstimates } from '../composables/useZipEstimate'
 import ScrollToBtn from './scrollToBtn.vue'
-const { mobile } = useDisplay()
+const { smAndDown } = useDisplay()
 const zipDataFound = ref(false)
 const isAtBottom = ref(false)
 // This is the shared reactive state between form and results

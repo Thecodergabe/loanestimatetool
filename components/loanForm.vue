@@ -45,7 +45,7 @@
              class="px-2">
           <div id="downPaymentLabel"
                class="text-caption text-medium-emphasis">Down Payment (%)</div>
-          <PercentageSliderFeild v-model="loan.downPayment"
+          <percentageSliderField v-model="loan.downPayment"
                                  inputId="down_payment"
                                  label="Down Payment (%)"
                                  :min="0"
@@ -120,11 +120,11 @@
              class="px-2">
           <div id="taxRateLabel"
                class="text-caption text-medium-emphasis">Property Tax Rate (%)</div>
-          <PercentageSliderFeild v-model="loan.taxRate"
+          <percentageSliderField v-model="loan.taxRate"
                                  inputId="property_tax_rate"
                                  :min="0"
                                  :max="20"
-                                 :step="1"
+                                 :step=".1"
                                  label="Property Tax Rate (%)"
                                  :aria-label="'Slider to manage loan tax rate in percentage'"
                                  :hint="zipDataFound ? 'Auto-filled from ZIP' : 'Enter your estimated premium'" />
@@ -175,7 +175,7 @@
              class="px-2">
           <div id="closingCostsLabel"
                class="text-caption text-medium-emphasis">Closing Costs (%)</div>
-          <PercentageSliderFeild v-model="loan.closingCosts"
+          <percentageSliderField v-model="loan.closingCosts"
                                  inputId="closing_costs"
                                  :min="0"
                                  :max="10"

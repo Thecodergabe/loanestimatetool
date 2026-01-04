@@ -36,6 +36,11 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         {
+          rel: 'preconnect',
+          href: 'https://cdn.jsdelivr.net',
+          crossorigin: ''
+        },
+        {
           rel: 'stylesheet',
           href: 'https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css'
         }
