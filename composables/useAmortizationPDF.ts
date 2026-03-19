@@ -1,104 +1,84 @@
-export function useAmortizationPDF() {
-  function padRow(col1: string, col2: string, col3: string, col4: string): string {
-    return [
-      col1.padEnd(6),
-      col2.padStart(18),
-      col3.padStart(18),
-      col4.padStart(24)
-    ].join(' ')
-  }
+/**
+ * @file composables/useAmortizationPDF.ts
+ * @description Professional PDF generation service for loan amortization schedules.
+ * Utilizes dynamic imports for jsPDF and autoTable to ensure compatibility 
+ * in library/NPM environments and minimize bundle size.
+ */
 
-  function generateAmortizationPDF(schedule: {
-    month: number
-    principalPaid: number
-    interest: number
-    balance: number
-  }[]): string[] {
-    const grouped = new Map<number, { principal: number; interest: number; balance: number }>()
-    schedule.forEach(p => {
-      const year = Math.ceil(p.month / 12)
-      if (!grouped.has(year)) {
-        grouped.set(year, { principal: 0, interest: 0, balance: p.balance })
+import type { AmortizationEntry } from '../models/loanModel.js';
+
+export const useAmortizationPDF = () => {
+  /**
+   * Generates and downloads a formatted PDF report of the amortization schedule.
+   * * @param schedule - Array of monthly payment breakdowns.
+   * @param zip - Optional ZIP code to include in the file name and header.
+   */
+  const downloadAmortizationPDF = async (schedule: AmortizationEntry[], zip: string = '') => {
+    // Ensure we are in a browser environment
+    if (typeof window === 'undefined') return;
+
+    try {
+      // Dynamic imports for library-agnostic performance
+      const { jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      
+      // Access the callable function from the module (handles various export types)
+      const autoTable = (autoTableModule.default || autoTableModule) as any;
+
+      const doc = new jsPDF();
+      const timestamp = new Date().toLocaleDateString();
+
+      // Header Configuration
+      doc.setFontSize(20);
+      doc.setTextColor(24, 103, 192); // Primary Blue
+      doc.text('Amortization Schedule', 14, 22);
+
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Generated on: ${timestamp}`, 14, 30);
+      if (zip) {
+        doc.text(`Property Location: ${zip}`, 14, 35);
       }
-      const entry = grouped.get(year)!
-      entry.principal += p.principalPaid
-      entry.interest += p.interest
-      entry.balance = p.balance
-    })
 
-    const lines: string[] = []
-    lines.push('Amortization Schedule (Yearly Summary)')
-    lines.push('')
-    lines.push(padRow('Year', 'Principal Paid', 'Interest Paid', 'Remaining Balance'))
-    lines.push('-'.repeat(80))
+      // Transform schedule data for table consumption
+      const tableRows = schedule.map(row => [
+        String(row.month),
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.principalPaid),
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.interest),
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.balance)
+      ]);
 
-    for (const [year, entry] of grouped.entries()) {
-      lines.push(
-        padRow(
-          year.toString(),
-          `$${entry.principal.toFixed(2)}`,
-          `$${entry.interest.toFixed(2)}`,
-          `$${entry.balance.toFixed(2)}`
-        )
-      )
+      // Execute Table Generation
+      autoTable(doc, {
+        startY: 40,
+        head: [['Month', 'Principal Paid', 'Interest Paid', 'Remaining Balance']],
+        body: tableRows,
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [24, 103, 192],
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { halign: 'center' },
+          1: { halign: 'right' },
+          2: { halign: 'right' },
+          3: { halign: 'right' }
+        },
+        styles: { fontSize: 9 },
+        margin: { top: 40 }
+      });
+
+      // Trigger Download
+      const fileName = zip ? `Amortization_Report_${zip}.pdf` : 'Amortization_Report.pdf';
+      doc.save(fileName);
+
+    } catch (error) {
+      console.error('PDF Export Generation Failed:', error);
+      throw new Error('Could not generate PDF. Please ensure jsPDF and jspdf-autotable are installed.');
     }
+  };
 
-    return lines
-  }
-
-  function downloadAmortizationPDF(schedule: {
-    month: number
-    principalPaid: number
-    interest: number
-    balance: number
-  }[]) {
-    const lines = generateAmortizationPDF(schedule)
-    const maxLinesPerPage = 45
-    const pages: string[] = []
-
-    for (let i = 0; i < lines.length; i += maxLinesPerPage) {
-      pages.push(lines.slice(i, i + maxLinesPerPage).join('\n'))
-    }
-
-    const objects: string[] = []
-    let offset = 0
-    const xref: string[] = ['0000000000 65535 f ']
-    let pdf = `%PDF-1.3\n`
-
-    objects.push('1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj')
-    objects.push(`2 0 obj << /Type /Pages /Kids [${pages.map((_, i) => `${i + 3} 0 R`).join(' ')}] /Count ${pages.length} >> endobj`)
-
-    pages.forEach((text, i) => {
-      const content = `BT /F1 10 Tf 50 800 Td (${text.replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/\n/g, ') Tj\n0 -14 Td (')}) Tj ET`
-      const contentLength = content.length
-      const contentObj = `${i + 3 + pages.length} 0 obj << /Length ${contentLength} >> stream\n${content}\nendstream endobj`
-
-      objects.push(`${i + 3} 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents ${i + 3 + pages.length} 0 R /Resources << >> >> endobj`)
-      objects.push(contentObj)
-    })
-
-    offset = pdf.length
-    objects.forEach(obj => {
-      xref.push(offset.toString().padStart(10, '0') + ' 00000 n ')
-      pdf += obj + '\n'
-      offset = pdf.length
-    })
-
-    const xrefOffset = offset
-    pdf += `xref\n0 ${objects.length + 1}\n` + xref.join('\n') + '\n'
-    pdf += `trailer << /Root 1 0 R /Size ${objects.length + 1} >>\n`
-    pdf += `startxref\n${xrefOffset}\n%%EOF`
-
-    const blob = new Blob([pdf], { type: 'application/pdf' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'amortization_schedule.pdf'
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
-  return {
-    downloadAmortizationPDF
-  }
-}
+  return { downloadAmortizationPDF };
+};

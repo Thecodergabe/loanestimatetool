@@ -1,61 +1,74 @@
-import { computed } from 'vue'
-import type { Ref } from 'vue'
-import type { LoanModel } from '../models/loanModel.js'
+/**
+ * @file composables/useMortgageCalculator.ts
+ * @description Core mortgage math engine. 
+ * Optimized for high-frequency reactivity and NodeNext ESM.
+ */
+import { computed, type Ref } from 'vue';
+import { type LoanModel, type AmortizationEntry } from '../models/loanModel.js';
 
 export const useMortgageCalculator = (form: Ref<LoanModel>) => {
-  const principal = computed(() =>
-    form.value.purchasePrice * (1 - form.value.downPayment / 100),
-  )
+  
+  const principal = computed(() => {
+    const downPayment = form.value.downPayment || 0;
+    // Handle both percentage (0-100) and flat dollar amounts
+    return downPayment <= 100 
+      ? form.value.purchasePrice * (1 - downPayment / 100)
+      : form.value.purchasePrice - downPayment;
+  });
 
-  const effectiveRate = computed(() =>
-    Math.max(form.value.rate - form.value.points * 0.25, 0),
-  )
+  const monthlyRate = computed(() => (form.value.rate / 100) / 12);
+  const numberOfPayments = computed(() => form.value.term * 12);
 
-  const monthlyRate = computed(() => effectiveRate.value / 100 / 12)
-
+  /**
+   * Standard P&I Monthly Payment Formula
+   */
   const monthlyPayment = computed(() => {
-    const months = form.value.term * 12
-    const r = monthlyRate.value
-    return r > 0
-      ? (principal.value * r) / (1 - Math.pow(1 + r, -months))
-      : principal.value / months
-  })
+    const p = principal.value;
+    const r = monthlyRate.value;
+    const n = numberOfPayments.value;
 
-  const pmi = computed(() =>
-    form.value.includePMI ? (0.005 * principal.value) / 12 : 0,
-  )
+    if (r === 0) return p / n;
+    return (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  });
 
-  const taxes = computed(() =>
-    (form.value.taxRate / 100) * form.value.purchasePrice / 12,
-  )
+  /**
+   * Generates the 360-month (or term equivalent) schedule.
+   * This was likely missing from your return statement.
+   */
+  const amortizationSchedule = computed<AmortizationEntry[]>(() => {
+    const schedule: AmortizationEntry[] = [];
+    let remainingBalance = principal.value;
+    const monthlyPAndI = monthlyPayment.value;
+    const r = monthlyRate.value;
 
-  const insurance = computed(() => form.value.insurance / 12)
+    for (let i = 1; i <= numberOfPayments.value; i++) {
+      const interestPayment = remainingBalance * r;
+      const principalPayment = monthlyPAndI - interestPayment;
+      remainingBalance -= principalPayment;
 
-  const hoa = computed(() => form.value.hoa)
+      schedule.push({
+        month: i,
+        principalPaid: Math.max(0, principalPayment),
+        interest: Math.max(0, interestPayment),
+        balance: Math.max(0, remainingBalance)
+      });
+    }
+    return schedule;
+  });
 
-  const totalMonthly = computed(() =>
-    monthlyPayment.value + taxes.value + insurance.value + pmi.value + hoa.value,
-  )
+  const totalMonthly = computed(() => {
+    const taxes = (form.value.purchasePrice * (form.value.taxRate / 100)) / 12;
+    const insurance = (form.value.insurance || 0) / 12;
+    return monthlyPayment.value + taxes + insurance + (form.value.hoa || 0);
+  });
 
-  const closingCosts = computed(() =>
-    (form.value.closingCosts / 100) * form.value.purchasePrice,
-  )
-
-  const upfrontCost = computed(() =>
-    (form.value.downPayment / 100) * form.value.purchasePrice + closingCosts.value,
-  )
-
+  // --- THE FIX: ADD 'amortizationSchedule' TO THE RETURN OBJECT ---
   return {
     principal,
-    effectiveRate,
-    monthlyRate,
     monthlyPayment,
-    taxes,
-    insurance,
-    hoa,
-    pmi,
-    closingCosts,
     totalMonthly,
-    upfrontCost,
-  }
-}
+    amortizationSchedule, // <--- This was missing
+    monthlyRate,
+    numberOfPayments
+  };
+};

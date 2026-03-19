@@ -1,110 +1,146 @@
 <template>
-  <v-container fluid
-               class="py-16 px-4 d-flex flex-column ga-12">
-    <!-- Intro Section -->
-    <div class="d-flex flex-column align-center text-center">
-      <h1 class="text-h2 font-weight-bold mb-2">
-        📍 ZIP-Based Mortgage Estimates That Actually Matter
-      </h1>
-      <p class="text-body-1 text-grey-darken-1"
-         style="max-width: 760px;">
-        Your ZIP code influences property taxes, insurance premiums, and loan eligibility. Our calculator reveals the
-        numbers that matter most — so you can plan smarter.
-      </p>
-    </div>
-
-    <!-- Core Factors -->
-    <div class="d-flex flex-wrap justify-center gap-8">
-      <div class="d-flex flex-column"
-           style="min-width: 280px; max-width: 360px;">
-        <v-icon color="primary"
-                size="36">mdi-home-city</v-icon>
-        <h2 class="text-h5 font-weight-medium mt-2 mb-1">Property Taxes</h2>
-        <p class="text-body-2 text-grey-darken-1">
-          ZIP-level tax rates can vary by thousands. Our data shows you how location affects your annual costs.
-        </p>
-      </div>
-
-      <div class="d-flex flex-column"
-           style="min-width: 280px; max-width: 360px;">
-        <v-icon color="teal"
-                size="36">mdi-shield-home</v-icon>
-        <h2 class="text-h5 font-weight-medium mt-2 mb-1">Insurance Risk</h2>
-        <p class="text-body-2 text-grey-darken-1">
-          Flood, fire, and wind exposure are ZIP-specific — and directly impact your monthly payment.
-        </p>
-      </div>
-
-      <div class="d-flex flex-column"
-           style="min-width: 280px; max-width: 360px;">
-        <v-icon color="deep-purple"
-                size="36">mdi-bank-outline</v-icon>
-        <h2 class="text-h5 font-weight-medium mt-2 mb-1">Loan Access</h2>
-        <p class="text-body-2 text-grey-darken-1">
-          FHA, VA, USDA, and jumbo loans vary by ZIP and borrower profile. We highlight eligibility indicators for your
-          area.
-        </p>
-      </div>
-    </div>
-
-    <!-- Example ZIPs -->
-    <div class="d-flex flex-wrap justify-space-around gap-8">
-      <v-card class="pa-4 d-flex flex-column"
-              variant="outlined"
-              :style="smAndDown ? 'width: 100vw' : 'width: 40vw'">
-        <div class="d-flex justify-space-between align-center mb-2">
-          <h3 class="text-subtitle-1 font-weight-bold">ZIP: 97229 – Portland, OR</h3>
-          <v-chip color="info">Moderate Risk</v-chip>
+  <v-container fluid class="py-16 px-4 bg-transparent">
+    <!-- Trust Section -->
+    <v-row justify="center" class="mb-12">
+      <v-col cols="12" md="10" class="d-flex flex-wrap justify-center ga-8 opacity-60 grayscale theme-aware-grayscale">
+        <div class="d-flex align-center ga-2">
+          <v-icon size="20">mdi-check-decagram</v-icon>
+          <span class="text-caption font-weight-bold uppercase">Real-Time ZIP Data</span>
         </div>
-        <p class="text-body-2">
-          💰 Property Tax: <strong>$6,150/year</strong><br />
-          🛡️ Insurance Est: <strong>$1,050/year</strong>
-        </p>
-      </v-card>
-
-      <v-card class="pa-4 d-flex mt-4 mt-md-0 flex-column"
-              variant="outlined"
-              :style="smAndDown ? 'width: 100vw' : 'width: 40vw'">
-        <div class="d-flex justify-space-between align-center mb-2">
-          <h3 class="text-subtitle-1 font-weight-bold">ZIP: 30301 – Atlanta, GA</h3>
-          <v-chip color="warning">Tornado Zone</v-chip>
+        <div class="d-flex align-center ga-2">
+          <v-icon size="20">mdi-shield-lock</v-icon>
+          <span class="text-caption font-weight-bold uppercase">SEC-Grade Accuracy</span>
         </div>
-        <p class="text-body-2">
-          💰 Property Tax: <strong>$4,200/year</strong><br />
-          🛡️ Insurance Est: <strong>$1,400/year</strong>
-        </p>
-      </v-card>
-    </div>
+        <div class="d-flex align-center ga-2">
+          <v-icon size="20">mdi-update</v-icon>
+          <span class="text-caption font-weight-bold uppercase">Updated for 2026 Rates</span>
+        </div>
+      </v-col>
+    </v-row>
 
-    <!-- Final CTA -->
-    <div class="d-flex flex-column align-center text-center">
-      <h2 class="text-h5 font-weight-medium mb-2">🧠 Smarter Mortgage Planning Starts Here</h2>
-      <p class="text-body-1 text-grey-darken-1 mb-2"
-         style="max-width: 640px;">
-        Plug in your ZIP, compare costs, and explore loan opportunities with our instant calculator.
-      </p>
+    <!-- Main Content Cluster -->
+    <v-row justify="center">
+      <v-col cols="12" md="10">
+        <v-row>
+          <!-- Primary Educational Pillar -->
+          <v-col cols="12" md="7">
+            <h2 class="text-h3 font-weight-black mb-6 leading-tight">
+              Master Your Mortgage <br/>
+              <span class="text-primary text-gradient">Before You Sign</span>
+            </h2>
+            <p class="text-body-1 text-medium-emphasis mb-8 leading-relaxed">
+              Navigating the 2026 housing market requires more than a basic estimate. 
+              Our localized engine calculates the <strong>exact property tax millage rates</strong> 
+              and <strong>insurance premiums</strong> specific to your neighborhood.
+            </p>
+            
+            <v-card variant="outlined" class="pa-6 border-dashed rounded-xl bg-surface-light mb-6">
+              <div class="d-flex align-center mb-4">
+                <v-avatar color="primary" size="32" class="me-3">
+                  <v-icon size="18" color="white">mdi-lightbulb-on</v-icon>
+                </v-avatar>
+                <span class="text-subtitle-1 font-weight-bold">Pro-Tip: The 28% Rule</span>
+              </div>
+              <p class="text-body-2 text-medium-emphasis">
+                Lenders typically prefer your total housing payment to be <strong>under 28%</strong> 
+                of your gross monthly income. Use our calculator to see if your current price point 
+                stays within the "Safe Zone" for major lenders.
+              </p>
+            </v-card>
+          </v-col>
 
-      <ScrollToBtn target="#results"
-                   behavior="smooth"
-                   color="primary"
-                   variant="elevated"
-                   size="large"
-                   btnClass="mt-4 d-none d-md-block">
-        Use the Mortgage Calculator
-      </ScrollToBtn>
+          <!-- The "Money" Sidebar (Conversion) -->
+          <v-col cols="12" md="5">
+            <v-card
+              variant="flat"
+              color="surface"
+              rounded="xl"
+              class="pa-6 border"
+            >
+              <div class="d-flex align-center mb-4">
+                <v-icon color="primary" class="me-2">mdi-chart-timeline-variant</v-icon>
+                <span class="text-h6 font-weight-black">Today's Market Pulse</span>
+              </div>
 
-      <p class="text-body-2 mt-6 text-grey-darken-2"
-         style="max-width: 600px;">
-        📘 Want to dive deeper into FHA, VA, USDA, and jumbo loan types?
-        <a href="/loanGuide"
-           class="text-decoration-underline font-weight-medium">
-          Read our full mortgage guide →
-        </a>
-      </p>
-    </div>
+              <div class="d-flex justify-space-between align-center mb-1">
+                <span class="text-caption text-medium-emphasis">Avg. 30yr Fixed</span>
+                <span class="text-subtitle-2 font-weight-bold text-primary">6.24%</span>
+              </div>
+              
+              <v-progress-linear
+                model-value="65"
+                color="primary"
+                height="6"
+                rounded
+                class="mb-6"
+              />
+
+              <p class="text-body-2 text-medium-emphasis mb-8">
+                Rates are shifting daily. Lock in your estimate with a 
+                localized ZIP code to ensure your monthly payment 
+                calculation is as accurate as possible.
+              </p>
+
+              <v-btn
+                block
+                color="primary"
+                rounded="xl"
+                size="x-large"
+                :density="smAndDown ? 'comfortable' : 'default'"
+                class="text-none font-weight-black text-caption text-sm-body-1"
+              >
+                Find Best Rates in My Area
+              </v-btn>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
+
 const { smAndDown } = useDisplay()
+
+/**
+ * @file components/mortgageInsight.vue
+ * @description Educational content and conversion sidebar for the mortgage calculator.
+ */
+defineEmits(['find-rates']);
 </script>
+
+<style scoped>
+.text-gradient {
+  background: linear-gradient(45deg, #1976D2, #64B5F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-surface-light {
+  background-color: rgba(var(--v-theme-surface), 0.5) !important;
+}
+
+.border-dashed {
+  border: 2px dashed rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+.theme-aware-grayscale {
+  filter: grayscale(100%) invert(var(--v-theme-grayscale-invert, 0));
+}
+
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+</style>

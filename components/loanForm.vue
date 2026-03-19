@@ -1,238 +1,281 @@
 <template>
-  <v-form v-model="isValid"
-          @submit.prevent="submitForm"
-          role="form"
-          aria-labelledby="formTitle">
-    <v-card class="d-flex flex-column"
-            min-width="35vw">
-      <v-card-title id="formTitle"
-                    class="pa-4">
-        Mortgage Calculator
-      </v-card-title>
+  <v-form>
+    <div class="mb-6">
+      <div class="d-flex align-center mb-4">
+        <v-icon color="primary" class="me-2" size="22">mdi-home-analytics</v-icon>
+        <h3 class="text-subtitle-1 font-weight-bold text-primary uppercase tracking-wider">
+          Loan Basics
+        </h3>
+      </div>
+      
+      <v-row dense>
+        <v-col cols="12" sm="6">
+          <v-text-field
+            v-model.number="loan.purchasePrice"
+            label="Purchase Price"
+            prefix="$"
+            variant="filled"
+            hide-details="auto"
+            persistent-placeholder
+          />
+        </v-col>
+        <v-col cols="12" sm="6">
+          <v-text-field
+            v-model.number="loan.rate"
+            label="Interest Rate"
+            suffix="%"
+            variant="filled"
+            hide-details="auto"
+            persistent-placeholder
+          />
+        </v-col>
+        <v-col cols="12" sm="6" class="mt-2">
+          <v-select
+            v-model="loan.term"
+            :items="[15, 20, 30]"
+            label="Loan Term (years)"
+            variant="filled"
+            hide-details
+          />
+        </v-col>
+        <v-col cols="12" sm="6" class="mt-2">
+          <v-select
+            v-model="loan.loanType"
+            :items="['CONV', 'FHA', 'VA', 'USDA']"
+            label="Loan Type"
+            variant="filled"
+            hide-details
+          />
+        </v-col>
+        
+        <v-col cols="12" class="mt-4">
+          <div class="d-flex justify-space-between align-center mb-1">
+            <label class="text-caption font-weight-bold">Down Payment (%)</label>
+            <span class="text-caption text-medium-emphasis">
+              Amount: {{ formatCurrency(loan.purchasePrice * (loan.downPayment / 100)) }}
+            </span>
+          </div>
+          <div class="d-flex align-center">
+            <v-slider
+              v-model="loan.downPayment"
+              min="0"
+              max="100"
+              step="1"
+              color="primary"
+              hide-details
+              class="me-4"
+            />
+            <v-text-field
+              v-model.number="loan.downPayment"
+              suffix="%"
+              variant="filled"
+              density="compact"
+              hide-details
+              style="width: 80px"
+            />
+          </div>
+        </v-col>
+      </v-row>
+    </div>
 
-      <v-card-text class="d-flex flex-column">
-        <!-- Section: Loan Basics -->
-        <div class="text-subtitle-1 font-weight-medium"
-             id="loanBasics">Loan Basics</div>
+    <v-expansion-panels v-model="panelState" variant="accordion">
+      
+      <v-expansion-panel :value="0" elevation="0">
+        <v-expansion-panel-title class="px-0 font-weight-bold text-primary">
+          <v-icon start :color="zipDataFound ? 'success' : 'primary'">
+            {{ zipDataFound ? 'mdi-map-marker-check' : 'mdi-map-marker' }}
+          </v-icon>
+          Location & Taxes
+        </v-expansion-panel-title>
+        
+        <v-expansion-panel-text class="px-0">
+          <v-row dense>
+            <v-col cols="12">
+              <v-menu
+                v-model="showZipHelper"
+                :activator="'.zip-input-field'"
+                location="top center"
+                offset="10"
+                transition="slide-y-transition"
+                :open-on-click="false"
+                :close-on-content-click="false"
+              >
+                <v-card max-width="300" class="rounded-lg border-primary-thin pa-3 shadow-lg bg-surface">
+                  <div class="d-flex align-center ga-2 mb-1">
+                    <v-icon color="primary" size="18">mdi-information-outline</v-icon>
+                    <span class="text-caption font-weight-black text-uppercase">Localization Active</span>
+                  </div>
+                  <p class="text-caption text-medium-emphasis">
+                    Enter your 5-digit ZIP code to pull 2026 property tax rates and insurance averages for your neighborhood.
+                  </p>
+                </v-card>
+              </v-menu>
 
-        <div class="d-flex flex-wrap flex-column flex-lg-row form-pair"
-             role="group"
-             aria-labelledby="loanBasics">
-          <v-text-field v-model="loan.purchasePrice"
-                        label="Purchase Price"
-                        prefix="$"
-                        type="number"
-                        class="flex-grow-1"
-                        hide-details="auto"
-                        aria-label="House purchase price"
-                        density="default"
-                        variant="filled"
-                        autocomplete="off" />
+              <v-text-field
+                v-model="loan.zip"
+                label="ZIP Code"
+                prepend-inner-icon="mdi-map-marker"
+                variant="filled"
+                hide-details
+                class="zip-input-field"
+                @focus="showZipHelper = true"
+                @blur="showZipHelper = false"
+                @update:model-value="onZipInput"
+              />
+            </v-col>
+            
+            <v-col cols="12" class="mt-4">
+              <div class="d-flex justify-space-between mb-1">
+                <label class="text-caption font-weight-bold">Property Tax Rate</label>
+                <span class="text-caption font-weight-bold text-primary">{{ loan.taxRate }}%</span>
+              </div>
+              <v-slider
+                v-model="loan.taxRate"
+                min="0"
+                max="5"
+                step="0.01"
+                color="primary"
+                hide-details
+              />
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
 
-          <v-select v-model="loan.term"
-                    :items="LOAN_TERMS"
-                    label="Loan Term (years)"
-                    type="number"
-                    hide-details="auto"
-                    aria-label="Loan term in years"
-                    density="default"
-                    variant="filled"
-                    autocomplete="off" />
-        </div>
-
-        <div role="group"
-             aria-labelledby="downPaymentLabel"
-             class="px-2">
-          <div id="downPaymentLabel"
-               class="text-caption text-medium-emphasis">Down Payment (%)</div>
-          <percentageSliderField v-model="loan.downPayment"
-                                 inputId="down_payment"
-                                 label="Down Payment (%)"
-                                 :min="0"
-                                 :max="100"
-                                 :step="1"
-                                 :aria-label="'Slider to manage loan downpayment in percentage'"
-                                 :caption="`(Estimated down payment amount: ≈ ${formatCurrency(downPaymentAmount)})`" />
-        </div>
-
-        <!-- Section: Rate & Type -->
-        <div class="text-subtitle-1 font-weight-medium"
-             id="rateType">Rate & Type</div>
-
-        <div class="d-flex flex-wrap flex-column flex-lg-row form-pair"
-             role="group"
-             aria-labelledby="rateType">
-          <v-text-field v-model="loan.rate"
-                        label="Interest Rate (%)"
-                        suffix="%"
-                        type="number"
-                        variant="filled"
-                        hide-details="auto"
-                        density="default"
-                        aria-label="Interest rate percentage"
-                        autocomplete="off" />
-
-          <v-select v-model="loan.loanType"
-                    label="Loan Type"
-                    :items="loanTypes"
-                    density="default"
-                    hide-details="auto"
-                    variant="filled"
-                    aria-label="House purchase loan type"
-                    autocomplete="off" />
-        </div>
-
-        <!-- Section: Location & Fees -->
-        <div class="text-subtitle-1 font-weight-medium"
-             id="locationFees">Location & Fees</div>
-        <span v-if="!loan.zip.length"
-              id="zipHint"
-              class="text-caption text-medium-emphasis mt-n2">
-          (Enter your zipcode to get localized estimates)
-        </span>
-
-        <div class="d-flex flex-wrap flex-column flex-lg-row form-pair"
-             role="group"
-             aria-labelledby="locationFees">
-          <v-text-field v-model="loan.zip"
-                        label="ZIP Code"
-                        maxlength="5"
-                        hide-details="auto"
-                        variant="filled"
-                        autocomplete="postal-code"
-                        density="default"
-                        aria-describedby="zipHint" />
-
-          <v-text-field v-model="loan.hoa"
-                        label="Monthly HOA Dues"
-                        prefix="$"
-                        type="number"
-                        class="flex-grow-1"
-                        hide-details="auto"
-                        density="default"
-                        aria-label="Monthly hoa dues"
-                        variant="filled"
-                        autocomplete="off" />
-        </div>
-
-        <div role="group"
-             aria-labelledby="taxRateLabel"
-             class="px-2">
-          <div id="taxRateLabel"
-               class="text-caption text-medium-emphasis">Property Tax Rate (%)</div>
-          <percentageSliderField v-model="loan.taxRate"
-                                 inputId="property_tax_rate"
-                                 :min="0"
-                                 :max="20"
-                                 :step=".1"
-                                 label="Property Tax Rate (%)"
-                                 :aria-label="'Slider to manage loan tax rate in percentage'"
-                                 :hint="zipDataFound ? 'Auto-filled from ZIP' : 'Enter your estimated premium'" />
-        </div>
-
-        <!-- Section: Insurance & PMI -->
-        <div class="text-subtitle-1 font-weight-medium"
-             id="insurancePMI">Insurance & PMI</div>
-
-        <div class="d-flex flex-wrap flex-column flex-lg-row form-pair align-center"
-             role="group"
-             aria-labelledby="insurancePMI">
-          <v-text-field v-model="loan.insurance"
-                        label="Homeowners Insurance"
-                        prefix="$"
-                        type="number"
-                        hide-details="auto"
-                        density="default"
-                        aria-label="Home owners insurance coste"
-                        variant="filled"
-                        autocomplete="off" />
-
-          <v-switch v-model="loan.includePMI"
-                    label="Include Private Mortgage Insurance"
-                    color="primary"
-                    density="compact"
-                    hide-details="auto"
-                    aria-label="Private mortgaga insurance"
-                    class="mt-4 mx-auto" />
-        </div>
-
-        <!-- Section: Additional Costs -->
-        <div class="text-subtitle-1 font-weight-medium"
-             id="additionalCosts">Additional Costs</div>
-
-        <v-text-field v-model="loan.points"
-                      label="Points Paid"
-                      suffix="pts"
-                      type="number"
-                      hide-details="auto"
-                      density="default"
-                      aria-label="Points paid"
-                      variant="filled"
-                      autocomplete="off" />
-
-        <div role="group"
-             aria-labelledby="closingCostsLabel"
-             class="px-2">
-          <div id="closingCostsLabel"
-               class="text-caption text-medium-emphasis">Closing Costs (%)</div>
-          <percentageSliderField v-model="loan.closingCosts"
-                                 inputId="closing_costs"
-                                 :min="0"
-                                 :max="10"
-                                 :step="1"
-                                 :aria-label="'Slider to manage loan closing cost in percentage'"
-                                 label="Closing Costs (%)" />
-        </div>
-      </v-card-text>
-    </v-card>
+      <v-expansion-panel :value="1" elevation="0">
+        <v-expansion-panel-title class="px-0 font-weight-bold text-primary">
+          <v-icon start color="primary">mdi-shield-home</v-icon>
+          Insurance & Additional Costs
+        </v-expansion-panel-title>
+        
+        <v-expansion-panel-text class="px-0">
+          <v-row dense>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="loan.insurance"
+                label="Annual Insurance"
+                prefix="$"
+                variant="filled"
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="loan.hoa"
+                label="Monthly HOA"
+                prefix="$"
+                variant="filled"
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" class="pt-4">
+              <v-switch
+                v-model="loan.includePMI"
+                label="Include PMI"
+                color="primary"
+                hide-details
+                inset
+              />
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </v-form>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { LoanType } from '../models/loanModel'
-import type { LoanModel } from '../models/loanModel'
-const props = defineProps<{ modelValue: LoanModel, zipDataFound: boolean }>()
-const emit = defineEmits(['update:modelValue', 'seeResults'])
+/**
+ * @file components/loan-form.vue
+ * @description Mortgage parameter input engine. Supports programmatic focus/expansion
+ * for "Get Started" flows and localization triggers.
+ * * @property {LoanModel} modelValue - Reactive loan configuration object.
+ * @property {boolean} zipDataFound - Boolean flag indicating if external ZIP scraping was successful.
+ * @property {number|null} activePanel - Controlled expansion panel index (0 for Location, 1 for Insurance).
+ * * @emits update:modelValue - Syncs the loan data object.
+ * @emits update:activePanel - Syncs the current expansion state.
+ * @emits update:zip - Notifies parent to trigger localization logic on 5-digit entry.
+ */
+import { ref, computed } from 'vue';
+import type { LoanModel } from '../models/loanModel.js';
 
-const isValid = ref(false)
+const props = defineProps<{
+  modelValue: LoanModel;
+  zipDataFound: boolean;
+  activePanel: number | null;
+}>();
 
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: LoanModel): void;
+  (e: 'update:activePanel', value: number | null): void;
+  (e: 'update:zip', zip: string): void;
+}>();
+
+const showZipHelper = ref(false);
+
+/**
+ * Proxy for parent modelValue to allow local v-model usage with auto-sync.
+ */
 const loan = computed({
   get: () => props.modelValue,
-  set: (val: LoanModel) => emit('update:modelValue', val),
-})
+  set: (val) => emit('update:modelValue', val)
+});
 
-const loanTypes = Object.values(LoanType)
-const LOAN_TERMS = [10, 15, 20, 25, 30, 40]
+/**
+ * Synchronizes the expansion panel state with parent orchestration logic.
+ */
+const panelState = computed({
+  get: () => props.activePanel,
+  set: (val) => emit('update:activePanel', val)
+});
 
-const downPaymentAmount = computed(() => {
-  return (loan.value.purchasePrice * loan.value.downPayment) / 100
-})
+/**
+ * Evaluates ZIP input and emits update once character threshold is met.
+ * Automatically closes helper tooltip on successful entry.
+ */
+const onZipInput = (val: string) => {
+  if (val?.length === 5) {
+    showZipHelper.value = false;
+    emit('update:zip', val);
+  }
+};
 
-const formatCurrency = (value: number): string =>
-  value.toLocaleString(undefined, {
+/**
+ * Utility: Standard USD currency formatter for template labels.
+ */
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-
-const submitForm = () => {
-  emit('seeResults')
-}
+    maximumFractionDigits: 0
+  }).format(value);
+};
 </script>
+
 <style scoped>
-.form-pair>* {
-  flex-grow: 1;
-  flex-basis: 0;
-  width: 100%;
-  gap: 8px;
+/* Reset Vuetify expansion padding for a "flush" professional look */
+.v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
+  padding: 16px 0;
 }
 
-/* Full width on small screens */
-@media screen and (max-width: 768px) {
-  .form-pair>* {
-    max-width: 100%;
-  }
+.uppercase {
+  text-transform: uppercase;
+}
+
+.tracking-wider {
+  letter-spacing: 0.1em;
+}
+
+.border-primary-thin {
+  border: 1px solid rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Enhances the focus state of the primary action field */
+.zip-input-field :deep(.v-field--focused) {
+  border-color: rgb(var(--v-theme-primary)) !important;
 }
 </style>

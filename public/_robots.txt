@@ -1,2 +1,5 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.loanestimatetool.com/sitemap.xml
