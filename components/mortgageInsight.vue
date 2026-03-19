@@ -51,34 +51,46 @@
 
           <!-- The "Money" Sidebar (Conversion) -->
           <v-col cols="12" md="5">
-            <v-card flat class="pa-8 bg-primary rounded-xl text-white h-100 d-flex flex-column elevation-10">
-              <h3 class="text-h5 font-weight-bold mb-4">Today's Market Pulse</h3>
-              <div class="mb-6">
-                <div class="d-flex justify-space-between mb-2">
-                  <span class="text-caption">Avg. 30yr Fixed</span>
-                  <span class="text-caption font-weight-black">6.24%</span>
-                </div>
-                <v-progress-linear model-value="62" color="white" rounded height="6" />
+            <v-card
+              variant="flat"
+              color="surface"
+              rounded="xl"
+              class="pa-6 border"
+            >
+              <div class="d-flex align-center mb-4">
+                <v-icon color="primary" class="me-2">mdi-chart-timeline-variant</v-icon>
+                <span class="text-h6 font-weight-black">Today's Market Pulse</span>
+              </div>
+
+              <div class="d-flex justify-space-between align-center mb-1">
+                <span class="text-caption text-medium-emphasis">Avg. 30yr Fixed</span>
+                <span class="text-subtitle-2 font-weight-bold text-primary">6.24%</span>
               </div>
               
-              <p class="text-body-2 mb-8 opacity-90">
-                Rates are shifting daily. Lock in your estimate with a localized ZIP code to 
-                ensure your monthly payment calculation is as accurate as possible.
+              <v-progress-linear
+                model-value="65"
+                color="primary"
+                height="6"
+                rounded
+                class="mb-6"
+              />
+
+              <p class="text-body-2 text-medium-emphasis mb-8">
+                Rates are shifting daily. Lock in your estimate with a 
+                localized ZIP code to ensure your monthly payment 
+                calculation is as accurate as possible.
               </p>
-              
-              <v-spacer />
-              
-              <v-btn 
-                block 
-                color="white" 
-                size="x-large" 
-                variant="flat" 
-                class="text-primary text-none font-weight-black rounded-pill hover-lift"
-                @click="$emit('find-rates')"
+
+              <v-btn
+                block
+                size="x-large"
+                color="primary"
+                rounded="xl"
+                variant="flat"
+                class="font-weight-black text-none"
               >
                 Find Best Rates in My Area
               </v-btn>
-              <!-- Sponsored Section Removed -->
             </v-card>
           </v-col>
         </v-row>

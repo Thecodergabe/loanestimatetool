@@ -1,13 +1,10 @@
 <template>
   <v-no-ssr>
     <v-slide-y-reverse-transition>
-      <div 
-        v-if="shouldShow" 
-        class="mobile-sticky-footer"
-      >
+      <div v-if="shouldShow" class="mobile-sticky-footer">
         <v-card 
           flat 
-          class="rounded-t-xl px-6 py-4 border-t-sm"
+          class="rounded-t-xl px-6 py-4 border-t-sm bg-blur shadow-up"
           color="primary"
           theme="dark"
         >
@@ -38,6 +35,11 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * @file components/mobile-result-bar.vue
+ * @description Sticky bottom navigation bar for mobile viewports.
+ * Displays calculated monthly obligation when the primary chart is scrolled out of view.
+ */
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -50,23 +52,26 @@ defineEmits(['scroll-to-calc']);
 const { mobile } = useDisplay();
 const scrollY = ref(0);
 
-const handleScroll = () => {
-  scrollY.value = window.scrollY;
+/**
+ * Updates internal scroll state for visibility threshold.
+ */
+const handleScroll = (): void => { 
+  scrollY.value = window.scrollY; 
 };
 
-// Only show if mobile AND scrolled past the initial visualization (approx 600px)
-const shouldShow = computed(() => {
+/**
+ * Threshold logic: Visible on mobile when scrolled > 650px and estimate is valid.
+ */
+const shouldShow = computed((): boolean => {
   return mobile.value && scrollY.value > 650 && props.monthlyTotal > 0;
 });
 
 onMounted(() => window.addEventListener('scroll', handleScroll));
 onUnmounted(() => window.removeEventListener('scroll', handleScroll));
 
-const formatCurrency = (val: number) => {
+const formatCurrency = (val: number): string => {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0
   }).format(val);
 };
 </script>
@@ -77,16 +82,21 @@ const formatCurrency = (val: number) => {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 999;
-  /* Adds that "App" feel with a slight shadow behind the bar */
-  box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+  z-index: 2000;
 }
 
-.line-height-1 {
-  line-height: 1;
+.bg-blur {
+  backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.95), #2563EB) !important;
 }
+
+.shadow-up {
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.line-height-1 { line-height: 1; }
 
 .border-t-sm {
-  border-top: 1px solid rgba(255,255,255,0.1) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 </style>

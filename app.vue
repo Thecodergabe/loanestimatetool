@@ -1,22 +1,22 @@
 <template>
-  <v-app :theme="isDark ? 'dark' : 'light'">
+  <v-app :theme="themeName">
     <NuxtRouteAnnouncer />
 
     <AppNavBar @get-started="handleGetStarted">
       <template #theme-toggle>
-        <DarkModeToggle v-model="isDark" />
+        <DarkModeToggle 
+          v-model="isDark" 
+          @update:model-value="updateThemePreference" 
+        />
       </template>
     </AppNavBar>
 
-    <v-main class="bg-slate-50">
-      <!-- Pass the update event up from the page/component -->
-      <NuxtPage @update:estimate="val => currentMonthlyEstimate = val" />
+    <v-main class="bg-dynamic">
+      <NuxtPage @update:estimate="(val: number) => currentMonthlyEstimate = val"  />
       <app-footer class="mt-12" />
     </v-main>
 
-    <!-- Global Mobile Bar -->
     <MobileResultBar 
-      v-if="currentMonthlyEstimate > 0"
       :monthly-total="currentMonthlyEstimate" 
       @scroll-to-calc="handleGetStarted" 
     />
@@ -24,26 +24,65 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+/**
+ * @file app.vue
+ * @description Root application component. Orchestrates global state, 
+ * theme persistence, and cross-route navigation.
+ */
+import { ref, computed, onMounted, nextTick, provide } from 'vue';
 import { useTheme } from 'vuetify';
 import { useRouter, useRoute } from 'vue-router';
 
-const isDark = ref(false);
-const currentMonthlyEstimate = ref(0); // This will be updated by the calculator
 const theme = useTheme();
 const router = useRouter();
 const route = useRoute();
 
-// Sync theme engine
-watch(isDark, (val) => {
-  theme.global.name.value = val ? 'dark' : 'light';
+const isDark = ref(false);
+const currentMonthlyEstimate = ref(0);
+
+const themeName = computed(() => isDark.value ? 'dark' : 'light');
+
+/**
+ * Initializes theme from local storage or system hardware preference.
+ */
+onMounted(() => {
+  const savedTheme = localStorage.getItem('user-preference-theme');
+  if (savedTheme) {
+    isDark.value = savedTheme === 'dark';
+  } else {
+    isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  applyTheme(isDark.value ? 'dark' : 'light');
 });
 
 /**
- * Enhanced handleGetStarted logic.
- * Specifically targets the ZIP input after scrolling for maximum engagement.
+ * Updates global theme state and persists selection to local storage.
+ * @param {boolean} val - True for dark mode, false for light mode.
  */
-const handleGetStarted = async () => {
+const updateThemePreference = (val: boolean): void => {
+  isDark.value = val;
+  const target = val ? 'dark' : 'light';
+  localStorage.setItem('user-preference-theme', target);
+  applyTheme(target);
+};
+
+/**
+ * Updates the Vuetify global theme engine state.
+ * Uses a direct value update to sync with the v-app :theme provider.
+ * 
+ * @param {'light' | 'dark'} targetTheme
+ */
+const applyTheme = (targetTheme: 'light' | 'dark'): void => {
+  if (theme.global.name.value !== targetTheme) {
+    theme.global.name.value = targetTheme;
+  }
+};
+
+/**
+ * Handles smooth scroll and component focus for the main CTA.
+ * Redirects to index if called from a sub-route.
+ */
+const handleGetStarted = async (): Promise<void> => {
   if (route.path !== '/') {
     await router.push('/');
     await nextTick();
@@ -53,26 +92,24 @@ const handleGetStarted = async () => {
   const el = document.getElementById('calculator-top');
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    // Focus ZIP field specifically for the "Localization" helper popup
     setTimeout(() => {
       const zipInput = document.querySelector('.zip-input-field input') as HTMLElement;
       zipInput?.focus();
     }, 600);
   }
 };
+
+provide('triggerGetStarted', handleGetStarted);
 </script>
 
 <style>
-/* Smooth transition for the global background */
-.bg-slate-50 {
+.bg-dynamic {
   background-color: v-bind('isDark ? "#0F172A" : "#F8FAFC"') !important;
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html {
   scroll-behavior: smooth;
-  /* Prevent horizontal bounce on mobile */
   overflow-x: hidden;
 }
 </style>

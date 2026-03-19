@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset 
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.loanestimatetool.com/</loc>
     <priority>1.0</priority>
-    <changefreq>weekly</changefreq>
   </url>
-
   <url>
-    <loc>https://www.loanestimatetool.com/loanGuide</loc>
+    <loc>https://www.loanestimatetool.com/mortgage-loan-guide</loc>
     <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
   </url>
-
+  <url>
+    <loc>https://www.loanestimatetool.com/home-insurance</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.loanestimatetool.com/property-taxes</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.loanestimatetool.com/mortgage-pmi</loc>
+    <priority>0.8</priority>
+  </url>
 </urlset>
