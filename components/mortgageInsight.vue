@@ -83,11 +83,11 @@
 
               <v-btn
                 block
-                size="x-large"
                 color="primary"
                 rounded="xl"
-                variant="flat"
-                class="font-weight-black text-none"
+                size="x-large"
+                :density="smAndDown ? 'comfortable' : 'default'"
+                class="text-none font-weight-black text-caption text-sm-body-1"
               >
                 Find Best Rates in My Area
               </v-btn>
@@ -100,6 +100,10 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify'
+
+const { smAndDown } = useDisplay()
+
 /**
  * @file components/mortgageInsight.vue
  * @description Educational content and conversion sidebar for the mortgage calculator.
