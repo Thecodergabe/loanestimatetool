@@ -1,39 +1,44 @@
 <template>
   <div class="chart-container">
-    <v-skeleton-loader
-      v-if="!showChart"
-      type="image"
-      class="rounded-lg"
-      height="300"
+    <Doughnut
+      v-if="chartType === 'donut'"
+      :data="donutData"
+      :options="commonOptions"
     />
-    <ClientOnly>
-      <Doughnut
-        v-if="showChart && props.chartType === 'donut'"
-        key="donut"
-        :data="donutData"
-        :options="donutOptions"
-      />
-      <Line
-        v-else-if="props.chartType === 'line'"
-        key="line"
-        :data="lineData"
-        :options="lineOptions"
-      />
-      <Line
-        v-else-if="props.chartType === 'balance'"
-        key="balance"
-        :data="balanceData"
-        :options="balanceOptions"
-      />
-    </ClientOnly>
+    <Line
+      v-else
+      :data="lineData"
+      :options="commonOptions"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineAsyncComponent, onMounted } from 'vue'
-import { useLoanChart } from '../composables/useLoanChart'
-import type { LoanModel } from '../models/loanModel'
-import type { AmortizationEntry } from '../types/loan'
+/**
+ * @file components/loanChart.vue
+ * @description Mortgage visualization using Chart.js & vue-chartjs.
+ */
+import { computed } from 'vue'
+import { 
+  Chart as ChartJS, 
+  Title, 
+  Tooltip, 
+  Legend, 
+  ArcElement, 
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement, 
+  Filler 
+} from 'chart.js'
+import { Doughnut, Line } from 'vue-chartjs'
+import type { LoanModel, AmortizationEntry } from '../models/loanModel.js'
+
+// Register Chart.js components
+ChartJS.register(
+  Title, Tooltip, Legend, ArcElement, 
+  CategoryScale, LinearScale, PointElement, LineElement, Filler
+)
 
 const props = defineProps<{
   form: LoanModel
@@ -41,38 +46,54 @@ const props = defineProps<{
   chartType: 'donut' | 'line' | 'balance'
 }>()
 
-const showChart = ref(false)
-onMounted(() => {
-  requestIdleCallback(() => {
-    showChart.value = true
-  })
+/**
+ * Donut Chart Data (Principal vs Total Interest)
+ */
+const donutData = computed(() => {
+  const totalInterest = props.schedule.reduce((sum, m) => sum + m.interest, 0)
+  const principalAmount = props.form.purchasePrice - (props.form.purchasePrice * (props.form.downPayment / 100))
+  
+  return {
+    labels: ['Principal', 'Total Interest'],
+    datasets: [{
+      backgroundColor: ['#41B883', '#E46651'],
+      data: [principalAmount, totalInterest]
+    }]
+  }
 })
 
-const Doughnut = defineAsyncComponent(() =>
-  import('vue-chartjs').then(m => m.Doughnut)
-)
-const Line = defineAsyncComponent(() =>
-  import('vue-chartjs').then(m => m.Line)
-)
+/**
+ * Line Chart Data (Balance over time)
+ */
+const lineData = computed(() => {
+  // Filter for yearly data points to keep the chart clean
+  const yearlyData = props.schedule.filter((_, i) => i % 12 === 0)
+  
+  return {
+    labels: yearlyData.map(m => `Year ${m.month / 12}`),
+    datasets: [{
+      label: props.chartType === 'balance' ? 'Remaining Balance' : 'Equity Build',
+      backgroundColor: 'rgba(65, 184, 131, 0.2)',
+      borderColor: '#41B883',
+      fill: true,
+      data: yearlyData.map(m => m.balance)
+    }]
+  }
+})
 
-const formRef = ref(props.form)
-const scheduleRef = ref(props.schedule)
-
-const {
-  donutData,
-  lineData,
-  balanceData,
-  donutOptions,
-  lineOptions,
-  balanceOptions
-} = useLoanChart(formRef, scheduleRef)
-
+const commonOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'bottom' as const }
+  }
+}
 </script>
 
 <style scoped>
 .chart-container {
-  min-height: 300px;
-  content-visibility: auto;
-  contain-intrinsic-size: 300px;
+  position: relative;
+  height: 400px;
+  width: 100%;
 }
 </style>
