@@ -2,21 +2,21 @@
   <v-app :theme="themeName">
     <NuxtRouteAnnouncer />
 
-    <AppNavBar @get-started="handleGetStarted">
+    <app-nav-bar @get-started="handleGetStarted">
       <template #theme-toggle>
         <DarkModeToggle 
           v-model="isDark" 
           @update:model-value="updateThemePreference" 
         />
       </template>
-    </AppNavBar>
+    </app-nav-bar>
 
     <v-main class="bg-dynamic">
       <NuxtPage @update:estimate="(val: number) => currentMonthlyEstimate = val"  />
       <app-footer class="mt-12" />
     </v-main>
 
-    <MobileResultBar 
+    <mobile-result-bar 
       :monthly-total="currentMonthlyEstimate" 
       @scroll-to-calc="handleGetStarted" 
     />
@@ -32,6 +32,7 @@
 import { ref, computed, onMounted, nextTick, provide } from 'vue';
 import { useTheme } from 'vuetify';
 import { useRouter, useRoute } from 'vue-router';
+import mobileResultBar from './components/mobileResultBar.vue';
 
 const theme = useTheme();
 const router = useRouter();

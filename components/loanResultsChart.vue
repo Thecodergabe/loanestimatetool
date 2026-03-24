@@ -84,9 +84,9 @@
       <v-btn
         color="primary"
         block
-        size="large"
+        :size="xs ? 'small' : 'large'"
         class="text-none font-weight-bold "
-        rounded="lg"
+        rounded="xl"
         elevation="4"
         @click="handleDownload"
       >
@@ -120,7 +120,8 @@ import { Doughnut, Line } from 'vue-chartjs'
 import type { LoanModel } from '../models/loanModel.js'
 import { useMortgageCalculator } from '../composables/useMortgageCalculator.js'
 import { useAmortizationPDF } from '../composables/useAmortizationPDF.js'
-
+import { useDisplay } from 'vuetify'
+const { xs } = useDisplay()
 /**
  * Register required Chart.js modules.
  * vue-chartjs won't render unless these are explicitly registered.
