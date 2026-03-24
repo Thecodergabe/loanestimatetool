@@ -1,23 +1,21 @@
 /**
  * @file tests/useMortgageCalculator.test.ts
  * @description Unit tests for the mortgage calculation engine.
- * @module MortgageCalculator/Tests
  */
 
-import { describe, it, expect } from 'vitest';
-import { ref } from 'vue';
-// FIXED: Added .js extension to satisfy NodeNext resolution
-import { useMortgageCalculator } from '../composables/useMortgageCalculator.js';
-import { LoanType, type LoanModel } from '../models/loanModel.js';
+import { describe, it, expect } from 'vitest'
+import { ref } from 'vue'
+import { useMortgageCalculator } from './useMortgageCalculator.js'
+import { LoanType, type LoanModel } from '../models/loanModel.js'
 
 describe('useMortgageCalculator', () => {
   /**
-   * Test Case: Standard 30-year Fixed Mortgage
+   * Standard 30‑year fixed mortgage scenario.
    */
   it('calculates the correct monthly principal and interest', () => {
     const mockForm = ref<LoanModel>({
       purchasePrice: 400000,
-      downPayment: 80000, // 20% down
+      downPayment: 80000, // 20%
       term: 30,
       rate: 6.5,
       zip: '90210',
@@ -28,20 +26,20 @@ describe('useMortgageCalculator', () => {
       taxRate: 1.2,
       insurance: 1200,
       closingCosts: 3,
-    });
+    })
 
-    const { totalMonthly, principal } = useMortgageCalculator(mockForm);
+    const { totalMonthly, principal } = useMortgageCalculator(mockForm)
 
-    // Principal should be Purchase Price - Down Payment
-    expect(principal.value).toBe(320000);
+    // Principal = purchase price − down payment
+    expect(principal.value).toBe(320000)
 
-    // Monthly P&I for $320k @ 6.5% for 30yr is approx $2,022.62
-    // We check if the totalMonthly (which includes taxes/ins) is within range
-    expect(totalMonthly.value).toBeGreaterThan(2022);
-  });
+    // Monthly P&I for $320k @ 6.5% ≈ $2,022.62
+    // totalMonthly includes taxes + insurance, so it should exceed P&I
+    expect(totalMonthly.value).toBeGreaterThan(2022)
+  })
 
   /**
-   * Test Case: Amortization Schedule Integrity
+   * Ensures amortization schedule length and final payoff accuracy.
    */
   it('generates a full amortization schedule for the loan term', () => {
     const mockForm = ref<LoanModel>({
@@ -57,15 +55,15 @@ describe('useMortgageCalculator', () => {
       taxRate: 0,
       insurance: 0,
       closingCosts: 0,
-    });
+    })
 
-    const { amortizationSchedule } = useMortgageCalculator(mockForm);
+    const { amortizationSchedule } = useMortgageCalculator(mockForm)
 
-    // Should have 180 entries
-    expect(amortizationSchedule.value.length).toBe(180);
-    
-    // Final balance should be 0 (or very close due to rounding)
-    const finalMonth = amortizationSchedule.value[179];
-    expect(Math.round(finalMonth.balance)).toBe(0);
-  });
-});
+    // Should generate one entry per month
+    expect(amortizationSchedule.value.length).toBe(180)
+
+    // Final balance should be effectively zero
+    const finalMonth = amortizationSchedule.value[179]
+    expect(Math.round(finalMonth.balance)).toBe(0)
+  })
+})

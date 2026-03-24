@@ -64,14 +64,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { LoanType, type LoanModel } from '../models/loanModel.js';
+import { ref, computed, watch } from 'vue'
+import { LoanType, type LoanModel } from '../models/loanModel.js'
 
-const emit = defineEmits(['update:monthly-total']);
+/**
+ * Emits the calculated monthly total upward so the mobile result bar
+ * and other parent components can stay in sync.
+ */
+const emit = defineEmits(['update:monthly-total'])
 
-const activePanel = ref<number | null>(null);
-const zipDataFound = ref(false);
+/**
+ * Controls which expansion panel is open inside <loan-form>.
+ * Null = none open.
+ */
+const activePanel = ref<number | null>(null)
 
+/**
+ * Indicates whether a valid 5‑digit ZIP has been entered and processed.
+ * Used for UI states (chip color, animations, etc.).
+ */
+const zipDataFound = ref(false)
+
+/**
+ * Main reactive loan configuration object.
+ * Passed into <loan-form> and <loan-results-chart>.
+ */
 const loanData = ref<LoanModel>({
   purchasePrice: 450000,
   downPayment: 20,
@@ -85,58 +102,78 @@ const loanData = ref<LoanModel>({
   taxRate: 1.2,
   insurance: 1200,
   closingCosts: 3,
-});
+})
 
 /**
- * MORTGAGE MATH ENGINE
- * Calculates the monthly PITI (Principal, Interest, Taxes, Insurance)
+ * Core mortgage math engine.
+ * Computes the full monthly obligation (PITI + HOA).
+ * Handles the zero‑interest edge case to avoid NaN.
  */
 const monthlyPayment = computed(() => {
-  const p = loanData.value.purchasePrice * (1 - loanData.value.downPayment / 100);
-  const r = (loanData.value.rate / 100) / 12;
-  const n = loanData.value.term * 12;
-  
-  // Principal & Interest Formula: P [ r(1 + r)^n ] / [ (1 + r)^n – 1 ]
-  const pi = p * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-  
-  // Taxes & Insurance
-  const monthlyTaxes = (loanData.value.purchasePrice * (loanData.value.taxRate / 100)) / 12;
-  const monthlyInsurance = loanData.value.insurance / 12;
-  const monthlyHOA = loanData.value.hoa;
+  const p = loanData.value.purchasePrice * (1 - loanData.value.downPayment / 100)
+  const r = (loanData.value.rate / 100) / 12
+  const n = loanData.value.term * 12
 
-  return Math.round(pi + monthlyTaxes + monthlyInsurance + monthlyHOA);
-});
+  // Principal + Interest
+  let pi = 0
+  if (r === 0) {
+    pi = p / n
+  } else {
+    pi = p * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
+  }
+
+  // Taxes, insurance, HOA
+  const monthlyTaxes = (loanData.value.purchasePrice * (loanData.value.taxRate / 100)) / 12
+  const monthlyInsurance = loanData.value.insurance / 12
+  const monthlyHOA = loanData.value.hoa
+
+  return Math.round(pi + monthlyTaxes + monthlyInsurance + monthlyHOA)
+})
 
 /**
- * Sync with global app state for the Mobile Result Bar
+ * Pushes the computed monthly payment upward immediately and on every change.
+ * This keeps the mobile sticky footer updated in real time.
  */
-watch(monthlyPayment, (newVal) => {
-  emit('update:monthly-total', newVal);
-}, { immediate: true });
+watch(
+  monthlyPayment,
+  newVal => emit('update:monthly-total', newVal),
+  { immediate: true }
+)
 
+/**
+ * Exposes a method to parent components so they can:
+ * 1. Scroll the user back to the calculator
+ * 2. Open the ZIP panel
+ * 3. Auto-focus the ZIP input
+ *
+ * Includes SSR safety guards.
+ */
 defineExpose({
   triggerZipFocus: () => {
-    const el = document.getElementById('calculator-top');
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    activePanel.value = 0;
-    setTimeout(() => {
-      const input = document.querySelector('.zip-input-field input') as HTMLElement;
-      input?.focus();
-    }, 500);
-  }
-});
+    if (typeof window === 'undefined') return
 
-const handleZipChange = (zip: string) => {
-  if (zip.length === 5) {
-    zipDataFound.value = true;
-  } else {
-    zipDataFound.value = false;
+    const el = document.getElementById('calculator-top')
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    activePanel.value = 0
+
+    // Delay ensures the panel is open before focusing the input
+    setTimeout(() => {
+      const input = document.querySelector('.zip-input-field input') as HTMLElement | null
+      input?.focus()
+    }, 500)
   }
-};
+})
+
+/**
+ * Updates ZIP verification state.
+ * Called when <loan-form> emits update:zip.
+ */
+const handleZipChange = (zip: string) => {
+  zipDataFound.value = zip.length === 5
+}
 </script>
 
 <style scoped>
-/* Styles remain same as your previous version */
 .landing-wrapper {
   background: radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.05), transparent),
               radial-gradient(circle at bottom left, rgba(var(--v-theme-primary), 0.03), transparent);
@@ -145,6 +182,7 @@ const handleZipChange = (zip: string) => {
 .bg-card {
   background-color: rgba(var(--v-theme-surface), 0.7) !important;
   backdrop-filter: blur(10px);
+  will-change: backdrop-filter;
 }
 .tracking-tighter {
   letter-spacing: -0.05em !important;

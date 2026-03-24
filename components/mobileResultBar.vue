@@ -87,6 +87,7 @@ const formatCurrency = (val: number): string => {
 
 .bg-blur {
   backdrop-filter: blur(12px);
+  will-change: backdrop-filter;
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.95), #2563EB) !important;
 }
 

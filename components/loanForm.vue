@@ -52,7 +52,7 @@
           <div class="d-flex justify-space-between align-center mb-1">
             <label class="text-caption font-weight-bold">Down Payment (%)</label>
             <span class="text-caption text-medium-emphasis">
-              Amount: {{ formatCurrency(loan.purchasePrice * (loan.downPayment / 100)) }}
+              Amount: {{ downPaymentAmount }}
             </span>
           </div>
           <div class="d-flex align-center">
@@ -63,7 +63,7 @@
               step="1"
               color="primary"
               hide-details
-              class="me-4"
+              class="me-4 down-slider"
             />
             <v-text-field
               v-model.number="loan.downPayment"
@@ -221,6 +221,11 @@ const loan = computed({
   set: (val) => emit('update:modelValue', val)
 });
 
+/** Computed down payment amount for display purposes. */
+const downPaymentAmount = computed(() =>
+  loan.value.purchasePrice * (loan.value.downPayment / 100)
+)
+
 /**
  * Synchronizes the expansion panel state with parent orchestration logic.
  */
@@ -256,6 +261,10 @@ const formatCurrency = (value: number) => {
 /* Reset Vuetify expansion padding for a "flush" professional look */
 .v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
   padding: 16px 0;
+}
+
+.down-slider {
+  min-width: 140px;
 }
 
 .uppercase {

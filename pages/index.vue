@@ -1,10 +1,10 @@
 <template>
   <div class="page-wrapper px-4 px-md-0">
-    <loan-estimator-container 
-      ref="estimator" 
+    <loan-estimator-container
+      ref="estimator"
       @update:monthly-total="(val: string) => $emit('update:estimate', val)"
     />
-    
+
     <v-spacer class="my-8" />
 
     <mortgage-insight @find-rates="handleFindRates" />
@@ -16,40 +16,41 @@
  * @file pages/index.vue
  * @description Entry point. Handles automated focus for arriving visitors.
  */
-import { ref, onMounted, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
-import { useHead } from 'nuxt/app';
-defineEmits(['update:estimate']);
+import { ref, onMounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
+import { useHead } from 'nuxt/app'
 
-const route = useRoute();
-const estimator = ref(null);
+defineEmits(['update:estimate'])
+
+const route = useRoute()
+const estimator = ref<InstanceType<any> | null>(null)
 
 /**
  * If the user arrives with a 'get-started' intent, trigger the input focus.
  */
 onMounted(async () => {
   if (route.query.focus === 'true') {
-    await nextTick();
-    handleFindRates();
+    await nextTick()
+    handleFindRates()
   }
-});
+})
 
 /**
  * Handles the 'Find Rates' event or global focus trigger.
  */
 const handleFindRates = () => {
-  if (estimator.value) {
-    // @ts-ignore - access child method
-    estimator.value.triggerZipFocus?.();
-  }
-};
+  estimator.value?.triggerZipFocus?.()
+}
 
 useHead({
   title: 'LoanEstimateTool | Precise 2026 Mortgage Planning',
   meta: [
-    { name: 'description', content: 'Professional grade mortgage calculator.' }
+    {
+      name: 'description',
+      content: 'Professional grade mortgage calculator.'
+    }
   ]
-});
+})
 </script>
 
 <style scoped>

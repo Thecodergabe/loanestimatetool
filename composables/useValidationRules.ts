@@ -1,4 +1,3 @@
-// composables/useValidationRules.ts
 export const useValidationRules = () => {
   const required = (v: unknown) => !!v || 'This field is required'
   const number = (v: number) => !isNaN(v) || 'Must be a number'

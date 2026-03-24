@@ -76,29 +76,36 @@
 <script setup lang="ts">
 /**
  * @file components/percentageSliderField.vue
- * @description A synchronized Slider + Text Field component.
- * Optimized for mortgage inputs like Interest Rates and Down Payments.
- * Supports SSR-safe ID generation and Vuetify 3.
+ * @description Combined slider + text field input for percentage‑based values.
+ * Ideal for mortgage inputs such as interest rate and down payment.
+ * Includes SSR‑safe ID generation and Vuetify 3 accessibility support.
  */
 import { computed, toRefs } from 'vue'
 import { useDisplay } from 'vuetify'
 
 interface Props {
-  /** Unique ID for HTML associations */
+  /** Unique ID used for input and label associations */
   inputId: string
-  /** v-model binding value */
+
+  /** v-model value */
   modelValue: number
-  /** Human-readable label (used for Screen Readers) */
+
+  /** Accessible label (screen readers) */
   label?: string
-  /** Helper text displayed below the input */
+
+  /** Optional helper text */
   caption?: string
-  /** Minimum slider value */
+
+  /** Minimum allowed value */
   min?: number
-  /** Maximum slider value */
+
+  /** Maximum allowed value */
   max?: number
+
   /** Slider increment step */
   step?: number
-  /** Suffix for the text input (e.g., '%', 'yrs') */
+
+  /** Text-field suffix (e.g., '%', 'yrs') */
   suffix?: string
 }
 
@@ -118,37 +125,28 @@ const emit = defineEmits<{
 const { modelValue, min, max, step, inputId } = toRefs(props)
 const { smAndDown } = useDisplay()
 
-/**
- * Unique Label ID for ARIA relationships.
- */
+/** ARIA label ID for accessibility. */
 const labelId = computed(() => `${inputId.value}-label`)
 
-/**
- * Dynamic styling to ensure the text field remains readable on mobile.
- */
+/** Responsive width adjustments for mobile vs desktop. */
 const inputStyle = computed(() =>
-  !smAndDown.value 
-    ? { minWidth: '100px' } 
-    : { maxWidth: '100%' }
+  !smAndDown.value ? { minWidth: '100px' } : { maxWidth: '100%' }
 )
 
-/**
- * Two-way binding logic for v-model.
- */
+/** Two-way binding wrapper for v-model. */
 const internalValue = computed({
   get: () => modelValue.value,
-  set: (val: number) => emit('update:modelValue', val),
+  set: val => emit('update:modelValue', val),
 })
 
-/**
- * Manual increment/decrement logic for the action buttons.
- */
+/** Adjusts the value upward by one step. */
 const increment = () => {
   if (internalValue.value < max.value) {
     internalValue.value = Number((internalValue.value + step.value).toFixed(2))
   }
 }
 
+/** Adjusts the value downward by one step. */
 const decrement = () => {
   if (internalValue.value > min.value) {
     internalValue.value = Number((internalValue.value - step.value).toFixed(2))
@@ -158,8 +156,7 @@ const decrement = () => {
 
 <style scoped>
 /**
- * Custom styling for the slider thumb label to improve readability 
- * against different background colors.
+ * Improves readability of the slider thumb label.
  */
 :deep(.v-slider-thumb__label) {
   background-color: rgb(var(--v-theme-primary));
@@ -169,8 +166,7 @@ const decrement = () => {
 }
 
 /**
- * Accessibility utility: Hides elements visually but keeps them in the DOM 
- * for screen readers (WCAG compliance).
+ * Screen-reader-only utility (WCAG compliant).
  */
 .sr-only {
   position: absolute !important;

@@ -1,18 +1,18 @@
 /**
  * @file composables/useNavigation.ts
- * @description Global navigation state to coordinate CTAs across layouts and pages.
+ * @description Global navigation state used to coordinate CTAs across pages and layouts.
  */
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const scrollToCalculatorTrigger = ref(0);
+const scrollToCalculatorTrigger = ref(0)
 
 export const useNavigation = () => {
   const triggerGetStarted = () => {
-    scrollToCalculatorTrigger.value++;
-  };
+    scrollToCalculatorTrigger.value++
+  }
 
   return {
     scrollToCalculatorTrigger,
-    triggerGetStarted
-  };
-};
+    triggerGetStarted,
+  }
+}

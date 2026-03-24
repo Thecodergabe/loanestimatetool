@@ -13,46 +13,41 @@
 <script setup lang="ts">
 /**
  * @file components/scrollToBtn.vue
- * @description Smooth scrolling utility button for internal page navigation.
+ * @description Button component for smooth in‑page scrolling.
  */
 
 interface Props {
-  /** The CSS selector for the target element (e.g., '#calculator-top') */
-  target: string;
-  color?: string;
-  size?: string;
-  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain';
+  /** CSS selector for the scroll target (e.g., '#calculator-top') */
+  target: string
+  color?: string
+  size?: string
+  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   color: 'primary',
   size: 'default',
-  variant: 'elevated'
-});
+  variant: 'elevated',
+})
 
 /**
- * Executes a smooth scroll to the target element.
- * Uses native window.scrollTo with fallback for older browsers.
+ * Smoothly scrolls to the target element.
  */
 const scrollToTarget = () => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return
 
-  const element = document.querySelector(props.target);
-  
+  const element = document.querySelector(props.target)
+
   if (element) {
-    // Get the top offset of the target element
-    const topOffset = element.getBoundingClientRect().top + window.scrollY;
-    
-    // Smooth scroll with a slight offset (40px) to prevent sticking to the very top
+    const topOffset = element.getBoundingClientRect().top + window.scrollY
     window.scrollTo({
       top: topOffset - 40,
-      behavior: 'smooth'
-    });
+      behavior: 'smooth',
+    })
   } else {
-    // Fallback: Just go to the very top if target is missing
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-};
+}
 </script>
 
 <style scoped>

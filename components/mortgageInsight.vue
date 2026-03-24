@@ -24,7 +24,7 @@
         <v-row>
           <!-- Primary Educational Pillar -->
           <v-col cols="12" md="7">
-            <h2 class="text-h3 font-weight-black mb-6 leading-tight">
+            <h2 class="fixed-h3 font-weight-black mb-6 leading-tight">
               Master Your Mortgage <br/>
               <span class="text-primary text-gradient">Before You Sign</span>
             </h2>
@@ -86,7 +86,7 @@
                 color="primary"
                 rounded="xl"
                 size="x-large"
-                :density="smAndDown ? 'comfortable' : 'default'"
+                density="comfortable"
                 class="text-none font-weight-black text-caption text-sm-body-1"
               >
                 Find Best Rates in My Area
@@ -112,6 +112,11 @@ defineEmits(['find-rates']);
 </script>
 
 <style scoped>
+.fixed-h3 {
+  font-size: 2.25rem; /* or whatever you want */
+  line-height: 1.2;
+}
+
 .text-gradient {
   background: linear-gradient(45deg, #1976D2, #64B5F6);
   -webkit-background-clip: text;
@@ -127,7 +132,8 @@ defineEmits(['find-rates']);
 }
 
 .theme-aware-grayscale {
-  filter: grayscale(100%) invert(var(--v-theme-grayscale-invert, 0));
+  filter: grayscale(100%);
+  will-change: filter;
 }
 
 .uppercase {
